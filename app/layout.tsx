@@ -4,11 +4,12 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import SearchBox from "@/components/SearchBox";
 import Sidebar from "@/components/Sidebar";
+import { ToastContainer } from "react-toastify";
 
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400","600", "500", "700"], // Add the desired font weights as needed
+  weight: ["400", "600", "500", "700"], // Add the desired font weights as needed
 });
 
 export const metadata: Metadata = {
@@ -29,6 +30,18 @@ export default function RootLayout({
         <SearchBox />
         <Sidebar />
         <div className="sm:pl-90 sm:mt-36 sm:pr-20">{children}</div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </body>
     </html>
   );

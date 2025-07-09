@@ -1,10 +1,16 @@
 "use client";
 import React, { useState } from "react";
 import { ArrowLeft, Upload, Plus, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import uploadToImgBB from "@/lib/imgbb";
+import Image from "next/image";
+import axiosInstance from "@/lib/axios";
+import { toast } from "react-toastify";
 
 interface ProductForm {
-  title: string;
+  productTitle: string;
   description: string;
+  productImages: string[];
   category: string;
   brand: string;
   model: string;
@@ -18,15 +24,17 @@ interface ProductForm {
   quantity: string;
   sku: string;
   enableNegotiation: boolean;
-  tags: string;
+  tags: string[];
   seoTitle: string;
   seoDescription: string;
 }
 
 const AddProductPage: React.FC = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState<ProductForm>({
-    title: "",
+    productTitle: "",
     description: "",
+    productImages: [],
     category: "",
     brand: "",
     model: "",
@@ -40,7 +48,7 @@ const AddProductPage: React.FC = () => {
     quantity: "",
     sku: "",
     enableNegotiation: false,
-    tags: "",
+    tags: [],
     seoTitle: "",
     seoDescription: "",
   });
@@ -122,15 +130,49 @@ const AddProductPage: React.FC = () => {
     // Handle file drop logic here
   };
 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = await uploadToImgBB(file);
+      // console.log(url)
+      if (url) {
+        setFormData((prev) => ({
+          ...prev,
+          productImages: [...prev.productImages, url],
+        }));
+      }
+      console.log(formData.productImages);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await axiosInstance.post("/products", {
+        ...formData,
+        sellerId: "64fd2c8f76d123456789abcd",
+      });
+      router.push("/seller/products");
+      toast.success("Product submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting product:", error);
+      toast.error("Failed to submit product. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full mx-auto">
         {/* Header */}
         <div className="flex flex-col mb-6">
-          <button className="flex items-center text-2xl font-bold hover:text-gray-600 mr-4">
+          <button
+            className="flex items-center text-2xl font-bold hover:text-gray-600 mr-4"
+            onClick={router.back}
+          >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Add New Product
           </button>
+
           <p className="text-sm text-gray-600 ml-6">
             Fill in the details to list your product for sale
           </p>
@@ -150,8 +192,8 @@ const AddProductPage: React.FC = () => {
                   type="text"
                   placeholder="Type Product Name"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  value={formData.productTitle}
+                  onChange={(e) => handleInputChange("productTitle", e.target.value)}
                 />
               </div>
 
@@ -175,6 +217,40 @@ const AddProductPage: React.FC = () => {
                 <label className="block text-md font-medium text-gray-700 mb-2">
                   Product Images <span className="text-red-500">*</span>
                 </label>
+                {formData.productImages.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
+                    {formData.productImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className="relative group aspect-square overflow-hidden rounded-lg"
+                      >
+                        <Image
+                          src={image}
+                          alt={`Product Image ${index + 1}`}
+                          fill
+                          className="object-cover hover:scale-105 transition-transform"
+                          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                          unoptimized
+                        />
+                        <button
+                          type="button"
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              productImages: prev.productImages.filter(
+                                (_, i) => i !== index
+                              ),
+                            }))
+                          }
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                     dragActive
@@ -193,9 +269,21 @@ const AddProductPage: React.FC = () => {
                   <p className="text-sm text-gray-500 mb-4">
                     or click to browse (Max 10MB each)
                   </p>
-                  <button className="px-4 py-2 text-black border  hover:text-white rounded-md hover:bg-secondary transition-colors">
-                    Select Files
-                  </button>
+                  <div className="px-4 py-2 text-black border w-fit  hover:text-white rounded-md hover:bg-secondary transition-colors mx-auto">
+                    <input
+                      type="file"
+                      id="product-image"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="product-image"
+                      className="cursor-pointer px-4 py-2 rounded-md "
+                    >
+                      Select Image
+                    </label>{" "}
+                  </div>
                 </div>
               </div>
 
@@ -441,7 +529,7 @@ const AddProductPage: React.FC = () => {
             </h2>
 
             <div className="space-y-6">
-              <div>
+                <div>
                 <label className="block text-md font-medium text-gray-700 mb-2">
                   Tags
                 </label>
@@ -449,10 +537,18 @@ const AddProductPage: React.FC = () => {
                   type="text"
                   placeholder="eg: smartphone, android, ios, flagship, value-oriented"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={formData.tags}
-                  onChange={(e) => handleInputChange("tags", e.target.value)}
+                  value={formData.tags.join(", ")}
+                  onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    tags: e.target.value
+                    .split(",")
+                    .map((tag) => tag.trim())
+                    .filter((tag) => tag.length > 0),
+                  }))
+                  }
                 />
-              </div>
+                </div>
 
               <div>
                 <label className="block text-md font-medium text-gray-700 mb-2">
@@ -496,7 +592,10 @@ const AddProductPage: React.FC = () => {
               <button className="px-6 py-2 border border-gray-300 rounded-sm text-gray-700 hover:bg-gray-50 transition-colors">
                 Save Draft
               </button>
-              <button className="px-6 py-2 bg-secondary text-white rounded-sm hover:bg-secondary/90 transition-colors">
+              <button
+                className="px-6 py-2 bg-secondary text-white rounded-sm hover:bg-secondary/90 transition-colors"
+                onClick={handleSubmit}
+              >
                 Send for Review
               </button>
             </div>

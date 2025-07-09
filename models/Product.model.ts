@@ -93,14 +93,14 @@ const productSchema = new mongoose.Schema(
     salePrice: {
       type: Number,
       min: [0, "Sale price cannot be negative"],
-    //   validate: {
-    //     validator: function (v) {
-    //     //   Sale price should be less than or equal to the regular price
-    //       return v <= this.price;
-    //     },
-    //     message: (props) =>
-    //       `Sale price (${props.value}) must be less than or equal to the regular price (${props.path})`,
-    //   },
+      //   validate: {
+      //     validator: function (v) {
+      //     //   Sale price should be less than or equal to the regular price
+      //       return v <= this.price;
+      //     },
+      //     message: (props) =>
+      //       `Sale price (${props.value}) must be less than or equal to the regular price (${props.path})`,
+      //   },
     },
     quantity: {
       type: Number,
@@ -149,16 +149,18 @@ const productSchema = new mongoose.Schema(
 
     // Vendor Information
     sellerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Seller",
-      required: true,
+      type: String
+      // type: mongoose.Schema.Types.ObjectId,
+      // ref: "Seller",
+      // required: true,
     },
   },
   {
-    timestamps: true, // Mongoose will automatically add createdAt and updatedAt fields
+    timestamps: true
   }
 );
 
-const Product = mongoose.model("Product", productSchema);
+const Product =
+  mongoose.models.Product || mongoose.model("Product", productSchema);
 
-module.exports = Product;
+export default Product;
