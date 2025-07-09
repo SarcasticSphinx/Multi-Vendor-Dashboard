@@ -191,7 +191,7 @@ const Page = ({ params }: PageProps) => {
     setSaving(true);
     try {
       await axiosInstance.patch(`/products/${id}`, product);
-      router.push("/products");
+      router.push("/seller/products");
     } catch (error) {
       console.error("Failed to update product:", error);
     } finally {
@@ -200,7 +200,7 @@ const Page = ({ params }: PageProps) => {
   };
 
   const handleDiscard = () => {
-    router.push("/products");
+    router.back();
   };
 
   if (loading) {
