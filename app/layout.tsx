@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import SearchBox from "@/components/SearchBox";
 import Sidebar from "@/components/Sidebar";
 import { ToastContainer } from "react-toastify";
+import AuthProvider from "../lib/AuthProvider";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -26,22 +27,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <Navbar />
-        <SearchBox />
-        <Sidebar />
-        <div className="sm:pl-90 sm:mt-36 sm:pr-20">{children}</div>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+        <AuthProvider>
+          <Navbar />
+          <SearchBox />
+          <Sidebar />
+          <div className="sm:pl-90 sm:mt-36 sm:pr-20">{children}</div>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </AuthProvider>
       </body>
     </html>
   );

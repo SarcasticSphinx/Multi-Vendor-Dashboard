@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { Plus, Search, Edit, Trash2, ChevronDown, TriangleAlert } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { set } from "mongoose";
 import Modal from "@/components/Modal";
 
 interface Product {
