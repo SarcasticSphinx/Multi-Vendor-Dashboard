@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import axiosInstance from "@/lib/axios";
 import Loading from "@/components/Loading";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Product {
   _id: string;
@@ -108,9 +109,10 @@ export default function CustomerHomePage() {
               
               <CardContent className="flex-grow p-4">
                 <div className="relative aspect-video mb-4 rounded-lg overflow-hidden bg-gray-100">
-                  <img
+                  <Image
                     src={product.productImages[0] || "/placeholder.jpg"}
                     alt={product.productTitle}
+                    fill
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     aria-label={`Image of ${product.productTitle}`}
                   />
@@ -152,7 +154,7 @@ export default function CustomerHomePage() {
               <CardFooter className="p-4 border-t border-gray-200">
                 <Link href={`/products/${product._id}`} className="w-full">
                   <Button
-                    className="w-full bg-secondary hover:bg-secondary/90 transition-colors"
+                    className="w-full bg-primary hover:bg-primary/90 transition-colors"
                     aria-label={`View details for ${product.productTitle}`}
                     disabled={product.status === "out of stock"}
                   >
