@@ -7,7 +7,8 @@ export async function GET(req: NextRequest) {
     await connectToMongoDB();
     const { searchParams } = new URL(req.url);
     const sellerId = searchParams.get("sellerId");
-    const products = await Product.find({sellerId}).sort({ createdAt: -1 });
+    const query = sellerId || {};
+    const products = await Product.find(query).sort({ createdAt: -1 });
     return NextResponse.json(products);
   } catch (error) {
     const message =
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectToMongoDB();
     const data = await req.json();
-    // console.log("Received Product Data:", data); 
+    // console.log("Received Product Data:", data);
 
     const newProduct = await Product.create(data);
     return NextResponse.json(newProduct, { status: 201 });
@@ -37,4 +38,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
