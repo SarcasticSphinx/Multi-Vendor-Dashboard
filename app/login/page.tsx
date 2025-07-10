@@ -2,14 +2,15 @@
 
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
   const { data: session } = useSession();
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (session?.user?.role === "seller") {
       router.push("/seller");
-    } else if (session?.user?.role === "buyer") {
+    } else if (session?.user?.role === "customer") {
       router.push("/customer");
     }
   }, [session, router]);
@@ -25,20 +26,29 @@ export default function LoginPage() {
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     const res = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
+
     setLoading(false);
+
     if (!res?.ok) {
       toast("Login failed");
     }
+    // Session will auto-update, triggering useEffect
   };
 
   const handleGoogleLogin = () => {
-    signIn("google");
-    toast("Redirecting to Google login...");
+    signIn("google", {
+      redirect: false,
+    }).then((res) => {
+      if (!res?.ok) toast("Google login failed");
+      else toast("Redirecting...");
+    });
+    // Session will auto-update, triggering useEffect
   };
 
   return (
@@ -90,7 +100,7 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Sign in with Email"}
           </button>
         </form>
-        <div className="flex items-center "></div>
+
         <button
           onClick={handleGoogleLogin}
           className="w-full py-2 border border-secondary text-secondary font-semibold rounded hover:bg-secondary hover:text-white transition flex items-center justify-center"
