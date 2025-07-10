@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Box, CreditCard, House, Settings, ShoppingCart } from "lucide-react";
+import { Box, CircleHelp, CreditCard, Heart, House, Settings, ShoppingCart, Truck, UserRound } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 const Sidebar: React.FC = () => {
@@ -46,25 +46,30 @@ const Sidebar: React.FC = () => {
           icon: <House size={20} />,
         },
         {
-          path: "/customer/products",
-          label: "Products",
-          icon: <Box size={20} />,
+          path: "/customer/my-orders",
+          label: "My Orders",
+          icon: <Truck size={20} />,
         },
         {
-          path: "/customer/orders",
-          label: "Orders",
-          icon: <ShoppingCart size={20} />,
+          path: "/customer/wishlist",
+          label: "Wishlist",
+          icon: <Heart size={20} />,
         },
         {
-          path: "/customer/payments",
-          label: "Payments",
-          icon: <CreditCard size={20} />,
+          path: "/customer/profile",
+          label: "Profile",
+          icon: <UserRound size={20} />,
+        },
+        {
+          path: "/customer/support",
+          label: "Support",
+          icon: <CircleHelp size={20} />,
         },
         {
           path: "/customer/settings",
           label: "Settings",
           icon: <Settings size={20} />,
-        },
+        }
       ];
 
   return (

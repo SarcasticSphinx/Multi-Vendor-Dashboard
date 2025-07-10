@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        password: { label: "Password", type: "password", required: true },
       },
       async authorize(credentials) {
         await connectToMongoDB();
