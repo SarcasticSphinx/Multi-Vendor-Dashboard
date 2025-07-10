@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User.model";
 import bcrypt from "bcryptjs";
 import { connectToMongoDB } from "@/lib/mongoose";
+import Customer from "@/models/Customer.model";
 
 export async function POST(req: NextRequest) {
   await connectToMongoDB();
@@ -16,8 +17,7 @@ export async function POST(req: NextRequest) {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-
-  const user = await User.create({
+  const newUser = await User.create({
     name,
     email,
     password: hashedPassword,
@@ -25,5 +25,31 @@ export async function POST(req: NextRequest) {
     image: image || "",
   });
 
-  return NextResponse.json({ message: "User registered", user });
+  if (newUser.role === "customer") {
+    try {
+      await Customer.create({
+        user: newUser._id,
+        firstName: name.split(" ")[0],
+        lastName: name.split(" ")[1] || "",
+      });
+    } catch (error) {
+      await User.findByIdAndDelete(newUser._id);
+      console.error(
+        "Failed to create customer profile after user creation.",
+        error
+      );
+      return NextResponse.json(
+        {
+          error:
+            "User registration failed: Could not create associated customer profile.",
+        },
+        { status: 500 }
+      );
+    }
+  }
+
+  return NextResponse.json(
+    { message: "User registered", newUser },
+    { status: 201 }
+  );
 }
