@@ -1,12 +1,28 @@
-'use client';
+"use client";
 import Loading from "@/components/Loading";
 import axiosInstance from "@/lib/axios";
 import React, { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Star, Heart, Share2, ChevronRight, Shield, Truck, CreditCard } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import {
+  Star,
+  Heart,
+  Share2,
+  ChevronRight,
+  Shield,
+  Truck,
+  CreditCard,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import { toast } from "react-toastify";
 
 interface Product {
   _id: string;
@@ -34,11 +50,26 @@ interface Product {
 }
 
 const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
+  const { data: session } = useSession();
+  const [customerId, setCustomerId] = useState<string | null>(null);
   const { id } = use(props.params);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+
+  const fetchCustomerId = async () => {
+    const userId = session?.user?.id;
+    if (userId) {
+      try {
+        const response = await axiosInstance.get(`/customer/${userId}`);
+        setCustomerId(response.data._id);
+      } catch (error) {
+        console.error("Error fetching customer id:", error);
+      }
+    }
+    setLoading(false);
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -54,14 +85,41 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
   };
 
   useEffect(() => {
+    fetchCustomerId();
     fetchProducts();
   }, [id]);
+
+  async function handleAddToCart() {
+    if (!product) return;
+    try {
+      await axiosInstance.patch(
+        `/customer/add-to-cart/${customerId}?productId=${product._id}?quantity=${quantity}`
+      );
+      toast.success("Product added to cart successfully!");
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      toast.error("Failed to add product to cart");
+    }
+  }
+
+  async function handleAddToWishlist() {
+    if (!product) return;
+    try {
+      await axiosInstance.patch(
+        `/customer/add-to-wishlist/${customerId}?productId=${product._id}?quantity=${quantity}`
+      );
+      toast.success("Product added to wishlist successfully!");
+    } catch (error) {
+      console.error("Error adding product to wishlist:", error);
+      toast.error("Failed to add product to wishlist");
+    }
+  }
 
   if (loading || !product) {
     return <Loading />;
   }
 
-  const discountPercentage = product.salePrice 
+  const discountPercentage = product.salePrice
     ? Math.round((1 - product.salePrice / product.price) * 100)
     : 0;
 
@@ -99,8 +157,12 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
               <CarouselContent>
                 {product.productImages.map((img, index) => (
                   <CarouselItem key={index} className="basis-1/4">
-                    <div 
-                      className={`relative aspect-square rounded-md cursor-pointer border-2 ${selectedImage === index ? 'border-primary' : 'border-transparent'}`}
+                    <div
+                      className={`relative aspect-square rounded-md cursor-pointer border-2 ${
+                        selectedImage === index
+                          ? "border-primary"
+                          : "border-transparent"
+                      }`}
                       onClick={() => setSelectedImage(index)}
                     >
                       <Image
@@ -122,11 +184,16 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
         {/* Product Info */}
         <div>
           <div className="mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">{product.productTitle}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {product.productTitle}
+            </h1>
             <div className="flex items-center mt-2">
               <div className="flex items-center">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <Star
+                    key={star}
+                    className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                  />
                 ))}
               </div>
               <span className="text-sm text-gray-500 ml-2">(24 reviews)</span>
@@ -138,14 +205,20 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
             <div className="flex items-center">
               {product.salePrice ? (
                 <>
-                  <span className="text-3xl font-bold text-gray-900">${product.salePrice.toFixed(2)}</span>
-                  <span className="text-lg text-gray-500 line-through ml-2">${product.price.toFixed(2)}</span>
+                  <span className="text-3xl font-bold text-gray-900">
+                    ${product.salePrice.toFixed(2)}
+                  </span>
+                  <span className="text-lg text-gray-500 line-through ml-2">
+                    ${product.price.toFixed(2)}
+                  </span>
                   <span className="ml-3 bg-red-100 text-red-800 text-sm font-medium px-2 py-0.5 rounded-full">
                     {discountPercentage}% OFF
                   </span>
                 </>
               ) : (
-                <span className="text-3xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
+                <span className="text-3xl font-bold text-gray-900">
+                  ${product.price.toFixed(2)}
+                </span>
               )}
             </div>
             {product.enableNegotiation && (
@@ -158,10 +231,14 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
             <div>
               <p className="text-sm font-medium text-gray-900">Status:</p>
               {product.status === "active" && (
-                <Badge variant="outline" className="text-green-600">In Stock</Badge>
+                <Badge variant="outline" className="text-green-600">
+                  In Stock
+                </Badge>
               )}
               {product.status === "low stock" && (
-                <Badge variant="destructive">Low Stock ({product.quantity} left)</Badge>
+                <Badge variant="destructive">
+                  Low Stock ({product.quantity} left)
+                </Badge>
               )}
               {product.status === "out of stock" && (
                 <Badge variant="destructive">Out of Stock</Badge>
@@ -170,20 +247,24 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
 
             {product.status !== "out of stock" && (
               <div>
-                <p className="text-sm font-medium text-gray-900 mb-2">Quantity:</p>
+                <p className="text-sm font-medium text-gray-900 mb-2">
+                  Quantity:
+                </p>
                 <div className="flex items-center">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   >
                     -
                   </Button>
                   <span className="px-4">{quantity}</span>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setQuantity(Math.min(product.quantity, quantity + 1))
+                    }
                   >
                     +
                   </Button>
@@ -194,17 +275,20 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
-            <Button 
-              size="lg" 
+            <Button
+              onClick={handleAddToCart}
+              size="lg"
               className="flex-1 bg-primary hover:bg-primary/90"
               disabled={product.status === "out of stock"}
             >
-              {product.status === "out of stock" ? "Out of Stock" : "Add to Cart"}
+              {product.status === "out of stock"
+                ? "Out of Stock"
+                : "Add to Cart"}
             </Button>
             <Button variant="outline" size="lg" className="flex-1">
               Buy Now
             </Button>
-            <Button variant="ghost" size="lg" className="p-2">
+            <Button variant="ghost" size="lg" className="p-2" onClick={handleAddToWishlist}>
               <Heart className="h-5 w-5" />
             </Button>
             <Button variant="ghost" size="lg" className="p-2">
@@ -214,7 +298,9 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
 
           {/* Product Details */}
           <div className="border-t border-gray-200 pt-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Product Details</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">
+              Product Details
+            </h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Brand</p>
@@ -250,7 +336,9 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
           {/* Features */}
           {product.features && product.features.length > 0 && (
             <div className="border-t border-gray-200 pt-6 mb-8">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Features</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                Features
+              </h2>
               <ul className="grid grid-cols-2 gap-2">
                 {product.features.map((feature, index) => (
                   <li key={index} className="flex items-center">
@@ -265,7 +353,9 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
           {/* Description */}
           {product.description && (
             <div className="border-t border-gray-200 pt-6 mb-8">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Description</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                Description
+              </h2>
               <p className="text-sm text-gray-700">{product.description}</p>
             </div>
           )}
