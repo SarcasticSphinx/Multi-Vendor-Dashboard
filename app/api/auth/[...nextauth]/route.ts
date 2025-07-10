@@ -1,6 +1,9 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
+import bcrypt from "bcryptjs";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { connectToMongoDB } from "@/lib/mongoose";
+import User from "@/models/User.model";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,17 +19,15 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const email = credentials?.email || "";
-        const password = credentials?.password || "";
+        await connectToMongoDB();
+        const { email, password } = credentials!;
+        const user = await User.findOne({ email });
 
-        if (!email.includes("@") || !email.endsWith(".com")) {
-          throw new Error("Invalid email format");
-        }
+        if (!user) throw new Error("No user found");
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) throw new Error("Invalid credentials");
 
-        if (password.length < 6) {
-          throw new Error("Password must be at least 6 characters long");
-        }
-        return null;
+        return user;
       },
     }),
   ],
@@ -36,15 +37,36 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      await connectToMongoDB();
+
+      if (account?.provider === "google") {
+        const existingUser = await User.findOne({ email: token.email });
+
+        if (!existingUser) {
+          const newUser = await User.create({
+            name: token.name,
+            email: token.email,
+            image: token.picture,
+            role: "buyer", 
+          });
+
+          token.role = newUser.role;
+        } else {
+          token.role = existingUser.role;
+        }
+      }
+
       if (user?.role) {
         token.role = user.role;
       }
+
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role as string;
+        session.user.role = token.role;
       }
       return session;
     },
