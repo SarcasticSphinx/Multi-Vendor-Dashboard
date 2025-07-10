@@ -19,7 +19,7 @@ export default function LoginPage() {
     if (session?.user?.role === "seller") {
       router.push("/seller/overview");
     } else if (session?.user?.role === "customer") {
-      router.push("/customer/overview");
+      router.push("/customer");
     }
   }, [session, router]);
 

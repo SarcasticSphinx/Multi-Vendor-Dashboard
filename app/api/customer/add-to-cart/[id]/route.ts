@@ -1,5 +1,6 @@
 import { connectToMongoDB } from "@/lib/mongoose";
 import Customer from "@/models/Customer.model";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
@@ -13,6 +14,9 @@ export async function PATCH(
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get("productId");
 
+    console.log('product id: ', productId)
+    console.log('customer id: ', id)
+
     if (!productId) {
       return NextResponse.json(
         { error: "Missing productId in query" },
@@ -21,10 +25,12 @@ export async function PATCH(
     }
 
     const updatedCustomer = await Customer.findOneAndUpdate(
-      { user: id },
-      { $push: { wishlist: productId } },
+      { user: new mongoose.Types.ObjectId(id) },
+      { $push: { cartProducts: new mongoose.Types.ObjectId(productId) } },
       { new: true }
     );
+
+    console.log(updatedCustomer, "updatedCustomer");
 
     if (!updatedCustomer) {
       return NextResponse.json(
@@ -35,10 +41,9 @@ export async function PATCH(
 
     return NextResponse.json(updatedCustomer);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown server error";
+    console.error("Error in PATCH /add-to-cart route:", error);
     return NextResponse.json(
-      { error: "Failed to update customer", details: message },
+      { message: "Failed to update customer", error },
       { status: 500 }
     );
   }

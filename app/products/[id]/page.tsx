@@ -51,25 +51,12 @@ interface Product {
 
 const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
   const { data: session } = useSession();
-  const [customerId, setCustomerId] = useState<string | null>(null);
+  // console.log(session, "session");
   const { id } = use(props.params);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-
-  const fetchCustomerId = async () => {
-    const userId = session?.user?.id;
-    if (userId) {
-      try {
-        const response = await axiosInstance.get(`/customer/${userId}`);
-        setCustomerId(response.data._id);
-      } catch (error) {
-        console.error("Error fetching customer id:", error);
-      }
-    }
-    setLoading(false);
-  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -85,15 +72,16 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
   };
 
   useEffect(() => {
-    fetchCustomerId();
     fetchProducts();
   }, [id]);
+
+  // console.log(customerId, "customerId");
 
   async function handleAddToCart() {
     if (!product) return;
     try {
       await axiosInstance.patch(
-        `/customer/add-to-cart/${customerId}?productId=${product._id}?quantity=${quantity}`
+        `/customer/add-to-cart/${session?.user.id}?productId=${product._id}&quantity=${quantity}`
       );
       toast.success("Product added to cart successfully!");
     } catch (error) {
@@ -106,7 +94,7 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
     if (!product) return;
     try {
       await axiosInstance.patch(
-        `/customer/add-to-wishlist/${customerId}?productId=${product._id}?quantity=${quantity}`
+        `/customer/add-to-wishlist/${session?.user.id}?productId=${product._id}&quantity=${quantity}`
       );
       toast.success("Product added to wishlist successfully!");
     } catch (error) {
@@ -288,7 +276,12 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
             <Button variant="outline" size="lg" className="flex-1">
               Buy Now
             </Button>
-            <Button variant="ghost" size="lg" className="p-2" onClick={handleAddToWishlist}>
+            <Button
+              variant="ghost"
+              size="lg"
+              className="p-2"
+              onClick={handleAddToWishlist}
+            >
               <Heart className="h-5 w-5" />
             </Button>
             <Button variant="ghost" size="lg" className="p-2">

@@ -5,8 +5,10 @@ import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { signIn } from "next-auth/react";
 import uploadToImgBB from "@/lib/imgbb";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [image, setImage] = useState('')
@@ -49,6 +51,7 @@ export default function RegisterPage() {
         setImage("");
         setPassword("");
         setConfirmPassword("");
+        router.push("/login");
       } else {
         const data = await res.json();
         toast(data.message || "Registration failed");
