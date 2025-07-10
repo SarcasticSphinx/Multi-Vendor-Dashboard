@@ -50,7 +50,13 @@ const Page = () => {
   const fetchProducts = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/products?sellerId=${session?.user?.id}`);
+      const sellerId = session?.user?.id;
+      if (!sellerId) {
+        console.log("No seller ID found in session");
+        setLoading(false);
+        return;
+      }
+      const response = await axiosInstance.get(`/products?sellerId=${sellerId}`);
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products in client side:", error);

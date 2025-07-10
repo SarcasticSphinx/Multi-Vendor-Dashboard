@@ -80,6 +80,7 @@ const productSchema = new mongoose.Schema(
           "Fingerprint",
           "Water Resistant",
           "NFC",
+          "Fast Charging",
         ],
       },
     ],
