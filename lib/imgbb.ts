@@ -19,7 +19,7 @@ const uploadToImgBB = async (file: File): Promise<string | null> => {
     const imageUrl = res.data?.data?.url;
     return imageUrl;
   } catch (err) {
-    console.error("Image upload failed", err);
+    console.error("Image upload failed in Server", err);
     return null;
   }
 };

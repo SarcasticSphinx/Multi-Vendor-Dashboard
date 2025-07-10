@@ -4,12 +4,27 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { signIn } from "next-auth/react";
+import uploadToImgBB from "@/lib/imgbb";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [image, setImage] = useState('')
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = await uploadToImgBB(file);
+      console.log(url);
+      if (!url) {
+        toast("Image upload failed");
+        return;
+      }
+      setImage(url);    }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,16 +35,18 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       //specific admin role
-      const role = email === "toha.admin@gmail.com" ? "seller" : "buyer"; 
+      const role = email === "suhail.admin@gmail.com" ? "seller" : "buyer";
 
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ email, password, role, name, image }),
       });
       if (res.ok) {
         toast("Registration successful! Please sign in.");
         setEmail("");
+        setName("");
+        setImage("");
         setPassword("");
         setConfirmPassword("");
       } else {
@@ -57,6 +74,34 @@ export default function RegisterPage() {
           <span className="text-lg font-semibold text-[#222]">Register</span>
         </div>
         <form onSubmit={handleRegister}>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Name
+          </label>
+          <input
+            type="text"
+            value={name}
+            autoComplete="name"
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter your name"
+            className="w-full p-2 mb-4 border border-gray-600 rounded bg-white focus:outline-none focus:border-secondary"
+            required
+          />
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Profile Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full p-2 mb-4 border border-gray-600 rounded bg-white focus:outline-none focus:border-secondary"
+          />
+          {image && (
+            <img
+              src={image}
+              alt="Preview"
+              className="w-20 h-20 object-cover rounded-full mb-4"
+            />
+          )}
           <label className="block text-sm font-medium text-gray-600 mb-1">
             Email
           </label>

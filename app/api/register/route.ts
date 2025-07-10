@@ -5,7 +5,7 @@ import { connectToMongoDB } from "@/lib/mongoose";
 
 export async function POST(req: NextRequest) {
   await connectToMongoDB();
-  const { name, email, password, role } = await req.json();
+  const { name, email, password, role, image } = await req.json();
 
   const existing = await User.findOne({ email });
   if (existing)
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     email,
     password: hashedPassword,
     role: role || "customer",
+    image: image || "",
   });
 
   return NextResponse.json({ message: "User registered", user });
