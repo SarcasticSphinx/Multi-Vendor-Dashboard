@@ -44,11 +44,12 @@ export const authOptions: NextAuthOptions = {
         const existingUser = await User.findOne({ email: token.email });
 
         if (!existingUser) {
+
           const newUser = await User.create({
             name: token.name,
             email: token.email,
             image: token.picture,
-            role: "buyer", 
+            role: "customer",
           });
 
           token.role = newUser.role;

@@ -19,10 +19,13 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
+      //specific admin role
+      const role = email === "toha.admin@gmail.com" ? "seller" : "buyer"; 
+
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role }),
       });
       if (res.ok) {
         toast("Registration successful! Please sign in.");
