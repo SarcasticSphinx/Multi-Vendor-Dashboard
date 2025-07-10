@@ -6,7 +6,7 @@ import { connectToMongoDB } from "@/lib/mongoose";
 import User from "@/models/User.model";
 import Customer from "@/models/Customer.model";
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,

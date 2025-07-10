@@ -2,11 +2,11 @@ import { connectToMongoDB } from "@/lib/mongoose";
 import Customer from "@/models/Customer.model";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+type Params = Promise<{ id: string }>;
+
+export async function GET(req: NextRequest, context: { params: Params }) {
+  const params = await context.params
+  const id = params.id;
 
   try {
     await connectToMongoDB();
@@ -25,11 +25,11 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: {params: Params}
 ) {
   try {
     await connectToMongoDB();
-
+    const params = await context.params;
     const { id } = params;
     const updates = await req.json();
 
@@ -61,10 +61,11 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Params }
 ) {
   try {
     await connectToMongoDB();
+    const params = await context.params;
 
     const { id } = params;
     const deletedCustomer = await Customer.findOneAndDelete({ user: id });

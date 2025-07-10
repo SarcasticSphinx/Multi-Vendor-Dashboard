@@ -2,14 +2,15 @@ import { connectToMongoDB } from "@/lib/mongoose";
 import Customer from "@/models/Customer.model";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
+type Params = Promise<{ id: string }>;
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Params }
 ) {
   try {
     await connectToMongoDB();
-
+    const params = await context.params;
     const { id } = params;
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get("productId");

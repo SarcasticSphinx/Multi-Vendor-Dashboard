@@ -58,20 +58,19 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    if (!id) return;
-    try {
-      const response = await axiosInstance.get(`/products/${id}`);
-      setProduct(response.data);
-    } catch (error) {
-      console.error("Error fetching product:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      if (!id) return;
+      try {
+        const response = await axiosInstance.get(`/products/${id}`);
+        setProduct(response.data);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchProducts();
   }, [id]);
 
