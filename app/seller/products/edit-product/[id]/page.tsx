@@ -44,7 +44,7 @@ interface Product {
   status?: string;
 }
 
-const Page = ({ params }: PageProps) => {
+const EditProductPage = ({ params }: PageProps) => {
   const { id } = use(params);
   const router = useRouter();
   const [product, setProduct] = useState<Product>({});
@@ -723,4 +723,4 @@ const Page = ({ params }: PageProps) => {
   );
 };
 
-export default Page;
+export default EditProductPage;

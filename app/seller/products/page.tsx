@@ -20,7 +20,7 @@ interface Product {
   enableNegotiation: boolean;
 }
 
-const Page = () => {
+const ProductsPage = () => {
   const {data: session} = useSession();
   // console.log(session?.user.id, "Session User ID");
   const [products, setProducts] = useState<Product[]>([]);
@@ -361,4 +361,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default ProductsPage;

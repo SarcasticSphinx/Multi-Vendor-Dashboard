@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import React from "react";
 import { FiBox, FiTruck, FiCheckCircle, FiXCircle, FiTrendingUp, FiAlertCircle } from "react-icons/fi";
 
-const Dashboard: React.FC = () => {
+const OverviewPage: React.FC = () => {
   const { data: session } = useSession();
   console.log(session)
   return (
@@ -87,4 +87,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default OverviewPage;
