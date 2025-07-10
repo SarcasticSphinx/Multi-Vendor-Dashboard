@@ -4,17 +4,68 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Box, CreditCard, House, Settings, ShoppingCart } from "lucide-react";
-
-const navItems = [
-  { path: "/overview", label: "Overview", icon: <House size={20} /> },
-  { path: "/products", label: "Products", icon: <Box size={20} /> },
-  { path: "/orders", label: "Orders", icon: <ShoppingCart size={20} /> },
-  { path: "/payments", label: "Payments", icon: <CreditCard size={20} /> },
-  { path: "/settings", label: "Settings", icon: <Settings size={20} /> },
-];
+import { useSession } from "next-auth/react";
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  if (!session) return null;
+  const isSeller = session?.user.role === "seller";
+  const navItems = isSeller
+    ? [
+        {
+          path: "/seller/overview",
+          label: "Overview",
+          icon: <House size={20} />,
+        },
+        {
+          path: "/seller/products",
+          label: "Products",
+          icon: <Box size={20} />,
+        },
+        {
+          path: "/seller/orders",
+          label: "Orders",
+          icon: <ShoppingCart size={20} />,
+        },
+        {
+          path: "/seller/payments",
+          label: "Payments",
+          icon: <CreditCard size={20} />,
+        },
+        {
+          path: "/seller/settings",
+          label: "Settings",
+          icon: <Settings size={20} />,
+        },
+      ]
+    : [
+        {
+          path: "/customer/overview",
+          label: "Overview",
+          icon: <House size={20} />,
+        },
+        {
+          path: "/customer/products",
+          label: "Products",
+          icon: <Box size={20} />,
+        },
+        {
+          path: "/customer/orders",
+          label: "Orders",
+          icon: <ShoppingCart size={20} />,
+        },
+        {
+          path: "/customer/payments",
+          label: "Payments",
+          icon: <CreditCard size={20} />,
+        },
+        {
+          path: "/customer/settings",
+          label: "Settings",
+          icon: <Settings size={20} />,
+        },
+      ];
 
   return (
     <aside className="min-w-80 min-h-screen bg-white border-r border-gray-200 fixed flex pl-20 pr-4 top-34">
