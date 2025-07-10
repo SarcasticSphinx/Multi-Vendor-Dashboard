@@ -37,6 +37,17 @@ const customerSchema = new mongoose.Schema(
         isDefault: { type: Boolean, default: false },
       },
     ],
+    cartProducts: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: { type: Number, required: true, default: 1 },
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
     orders: [
       {
         type: mongoose.Schema.Types.ObjectId,
