@@ -18,7 +18,7 @@ export default function RegisterPage() {
     const file = e.target.files?.[0];
     if (file) {
       const url = await uploadToImgBB(file);
-      console.log(url);
+      // console.log(url);
       if (!url) {
         toast("Image upload failed");
         return;

@@ -10,7 +10,7 @@ const Dashboard: React.FC = () => {
     <div className="py-6 min-h-screen">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Welcome back, John Doe!</h1>
+        <h1 className="text-2xl font-bold">Welcome back, {session?.user.name}!</h1>
         <p className="mt-1 text-gray-700">
           You&apos;ve made <span className="font-semibold">$2,450</span> today.
         </p>

@@ -17,9 +17,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (session?.user?.role === "seller") {
-      router.push("/seller");
+      router.push("/seller/overview");
     } else if (session?.user?.role === "customer") {
-      router.push("/customer");
+      router.push("/customer/overview");
     }
   }, [session, router]);
 
