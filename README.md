@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+**yet to complete a lot of things**
 
-## Getting Started
+This application is a role-based multivendor eCommerce dashboard, built using **Next.js (App Router)** and **MongoDB**. It has two distinct dashboards:
 
-First, run the development server:
+* **Customer Dashboard**: Where customers can browse products and order products.
+* **Seller Dashboard**: Where the seller can add, manage, and view their products.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Authentication is handled by **NextAuth** using both **Google** and **credentials** (email/password). Based on the user role (`customer` or `seller`), the user is redirected to their respective dashboard.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Features I’ve Implemented
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+#### Authentication & Authorization
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* Google and credentials-based login with NextAuth.
+* Role-based JWT and session management.
+* Restricted access for seller-specific pages.
 
-## Learn More
+#### User Roles
 
-To learn more about Next.js, take a look at the following resources:
+* Default users are registered as `customer`.
+* Only one predefined email is allowed to be the `seller` for now but anyone can be a seller by filling up a form which I will implement later.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### Product Management (Seller)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* Overview Page
+* Manage Orders 
+* 
+* Add product form with:
+  * Title, description, price, category, brand, features, images, etc.
+* Product image upload via **ImgBB API** initially for development but I will implement claudinary later.
+* Products are stored in MongoDB with `sellerId` referencing the seller.
+* Edit products (manage product details)
+* Settings page to edit seller informations like address, payment methods and others.
 
-## Deploy on Vercel
+#### Customer View
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Product listing page showing seller-added products on the main customer route.
+* Displays product details and image in product detail page.
+* Profile page to manage and update customer informations
+* My cart and wishlist functionalities
+* Order page to maintain orders
+* Support page to mail and contact seller
+* Overview page to see recent activities and total order, wishlist and pending deliveries
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### 
+
+### Assumptions Made Due to Incomplete Designs
+
+* Support Section, Products page, Product Details Page in customer section and settings page were custom-designed due to missing Figma components.
+* Anyone can be a seller by filling up a form of seller details but initially everyone is customer by default.
+* Product schema and input fields were inferred based on typical eCommerce platforms.
+* Cart, wishlist and Order systems ar included.
+
+---
+
+### Challenges Faced During Development
+
+* **NextAuth in App Router**: Required learning how to use `SessionProvider` properly in the new layout structure.
+* **Session Role Management**: Needed to extend `session.user` and `token` types to include `role` and `id` safely.
+* **Server Component Limits**: Using `useSession` inside server components caused errors. Had to ensure session handling was done in client components only.
+* **ImgBB Upload**: Some file size limitations caused `413 Payload Too Large` errors.
+* **Database Errors**: Accidentally inserting product documents into the `users` collection due to incorrect model usage.
+
