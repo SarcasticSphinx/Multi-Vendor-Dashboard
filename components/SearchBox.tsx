@@ -1,9 +1,15 @@
 "use client";
 import React from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Heart, ShoppingCart } from "lucide-react";
 import { FiSearch } from "react-icons/fi";
+import { useSession } from "next-auth/react";
+import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const SearchBox = () => {
+  const router = useRouter();
+  const { data: session } = useSession();
   return (
     <form className="flex items-center  p-4 lg:px-20 shadow-sm bg-white fixed top-16 left-0 z-50 w-full  mx-auto border border-gray-200">
       {/* Categories Dropdown */}
@@ -27,6 +33,23 @@ const SearchBox = () => {
       >
         Search
       </button>
+      {session?.user.role === "customer" && (
+        <div className="flex items-center gap-4 ml-6">
+          <Link href="/customer/wishlist">
+            <Button variant={"ghost"} className="flex items-center gap-2">
+              <Heart />
+              Wishlist
+            </Button>
+          </Link>
+
+          <Link href="/customer/my-cart">
+            <Button variant={"ghost"} className="flex items-center gap-2">
+              <ShoppingCart />
+              Orders
+            </Button>
+          </Link>
+        </div>
+      )}
     </form>
   );
 };
