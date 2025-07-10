@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToMongoDB } from "@/lib/mongoose";
 import User from "@/models/User.model";
+import Customer from "@/models/Customer.model";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -51,6 +52,21 @@ export const authOptions: NextAuthOptions = {
             image: token.picture,
             role: "customer",
           });
+
+          // if the new user is a customer, create a customer profile and if fails then delete the user
+          if (newUser.role === "customer") {
+            try {
+              await Customer.create({
+                user: newUser._id,
+                firstName: newUser.name.split(" ")[0],
+                lastName: newUser.name.split(" ")[1] || "",
+              });
+            } catch (error) {
+              console.log('Failed to create customer profile after user creation.', error);
+              await User.findByIdAndDelete(newUser._id);
+            }
+          }
+
 
           token.role = newUser.role;
           token.id = newUser._id.toString();
