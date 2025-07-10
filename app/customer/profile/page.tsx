@@ -4,8 +4,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Edit, Trash2, Star, Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+
+interface User {
+  name?: string;
+  email?: string;
+  image?: string;
+  role?: string;
+  id?: string;
+}
 
 export default function ProfilePage() {
+  const [user, setUser] = useState<Partial<User>>({});
+  const { data: session } = useSession();
+  useEffect(() => {
+    if (session?.user) {
+      setUser(session?.user as Partial<User>);
+    }
+  }, [session?.user])
   return (
     <div className="p-6 pb-12 min-h-screen">
       <h1 className="text-2xl font-semibold">Profile</h1>
@@ -38,7 +55,7 @@ export default function ProfilePage() {
                     <input
                       className="border rounded-sm px-2 py-1  w-full"
                       placeholder="First name"
-                      defaultValue="Alex"
+                      defaultValue={user.name?.split(" ")[0] || "No name provided"}
                     />
                   </div>
                   <div>
@@ -48,7 +65,7 @@ export default function ProfilePage() {
                     <input
                       className="border rounded-sm px-2 py-1  w-full"
                       placeholder="Last name"
-                      defaultValue="Johnson"
+                      defaultValue={user.name?.split(" ")[1] || "No name provided"}
                     />
                   </div>
                   <div>
@@ -58,7 +75,7 @@ export default function ProfilePage() {
                     <input
                       className="border rounded-sm px-2 py-1  w-full"
                       placeholder="Email"
-                      defaultValue="alex.johnson@email.com"
+                      defaultValue={user.email || "No email provided"}
                     />
                   </div>
                   <div>
