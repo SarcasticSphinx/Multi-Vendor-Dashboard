@@ -1,15 +1,26 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { data: session } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (session?.user?.role === "seller") {
+      router.push("/seller");
+    } else if (session?.user?.role === "buyer") {
+      router.push("/customer");
+    }
+  }, [session, router]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,8 +28,7 @@ export default function LoginPage() {
     const res = await signIn("credentials", {
       email,
       password,
-      redirect: true,
-      callbackUrl: "/",
+      redirect: false,
     });
     setLoading(false);
     if (!res?.ok) {
@@ -27,7 +37,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: "/" });
+    signIn("google");
     toast("Redirecting to Google login...");
   };
 
@@ -65,7 +75,12 @@ export default function LoginPage() {
             className="w-full p-2  border border-gray-600 rounded bg-white focus:outline-none focus:border-secondary"
             required
           />
-        <p className="text-sm text-gray-500 text-right mb-6 mt-2">Don&apos;t have an account? <Link href={'/register'} className="text-secondary">Register</Link></p>
+          <p className="text-sm text-gray-500 text-right mb-6 mt-2">
+            Don&apos;t have an account?{" "}
+            <Link href={"/register"} className="text-secondary">
+              Register
+            </Link>
+          </p>
 
           <button
             type="submit"
@@ -75,8 +90,7 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Sign in with Email"}
           </button>
         </form>
-        <div className="flex items-center ">
-        </div>
+        <div className="flex items-center "></div>
         <button
           onClick={handleGoogleLogin}
           className="w-full py-2 border border-secondary text-secondary font-semibold rounded hover:bg-secondary hover:text-white transition flex items-center justify-center"
