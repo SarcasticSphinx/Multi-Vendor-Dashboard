@@ -2,10 +2,12 @@ import { connectToMongoDB } from "@/lib/mongoose";
 import Product from "@/models/Product.model";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await connectToMongoDB();
-    const products = await Product.find().sort({ createdAt: -1 });
+    const { searchParams } = new URL(req.url);
+    const sellerId = searchParams.get("sellerId");
+    const products = await Product.find({sellerId}).sort({ createdAt: -1 });
     return NextResponse.json(products);
   } catch (error) {
     const message =

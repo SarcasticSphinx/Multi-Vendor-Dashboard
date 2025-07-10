@@ -6,6 +6,7 @@ import { Plus, Search, Edit, Trash2, ChevronDown, TriangleAlert } from "lucide-r
 import Image from "next/image";
 import Link from "next/link";
 import Modal from "@/components/Modal";
+import { useSession } from "next-auth/react";
 
 interface Product {
   _id: string;
@@ -20,6 +21,8 @@ interface Product {
 }
 
 const Page = () => {
+  const {data: session} = useSession();
+  // console.log(session?.user.id, "Session User ID");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,21 +47,21 @@ const Page = () => {
 
   const statuses = ["All", "Active", "Low stock", "Out of stock"];
 
-  const fetchProducts = async () => {
+  const fetchProducts = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get("/products");
+      const response = await axiosInstance.get(`/products?sellerId=${session?.user?.id}`);
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products in client side:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.user?.id]);
 
   React.useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

@@ -149,10 +149,9 @@ const productSchema = new mongoose.Schema(
 
     // Vendor Information
     sellerId: {
-      type: String
-      // type: mongoose.Schema.Types.ObjectId,
-      // ref: "Seller",
-      // required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
   {

@@ -6,6 +6,7 @@ import uploadToImgBB from "@/lib/imgbb";
 import Image from "next/image";
 import axiosInstance from "@/lib/axios";
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
 
 interface ProductForm {
   productTitle: string;
@@ -31,6 +32,8 @@ interface ProductForm {
 
 const AddProductPage: React.FC = () => {
   const router = useRouter();
+  const { data: session } = useSession();
+
   const [formData, setFormData] = useState<ProductForm>({
     productTitle: "",
     description: "",
@@ -150,7 +153,7 @@ const AddProductPage: React.FC = () => {
     try {
       await axiosInstance.post("/products", {
         ...formData,
-        sellerId: "64fd2c8f76d123456789abcd",
+        sellerId: session?.user.id, 
       });
       router.push("/seller/products");
       toast.success("Product submitted successfully!");
@@ -193,7 +196,9 @@ const AddProductPage: React.FC = () => {
                   placeholder="Type Product Name"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={formData.productTitle}
-                  onChange={(e) => handleInputChange("productTitle", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("productTitle", e.target.value)
+                  }
                 />
               </div>
 
@@ -529,7 +534,7 @@ const AddProductPage: React.FC = () => {
             </h2>
 
             <div className="space-y-6">
-                <div>
+              <div>
                 <label className="block text-md font-medium text-gray-700 mb-2">
                   Tags
                 </label>
@@ -539,16 +544,16 @@ const AddProductPage: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={formData.tags.join(", ")}
                   onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    tags: e.target.value
-                    .split(",")
-                    .map((tag) => tag.trim())
-                    .filter((tag) => tag.length > 0),
-                  }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      tags: e.target.value
+                        .split(",")
+                        .map((tag) => tag.trim())
+                        .filter((tag) => tag.length > 0),
+                    }))
                   }
                 />
-                </div>
+              </div>
 
               <div>
                 <label className="block text-md font-medium text-gray-700 mb-2">

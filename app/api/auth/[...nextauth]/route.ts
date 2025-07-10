@@ -53,13 +53,16 @@ export const authOptions: NextAuthOptions = {
           });
 
           token.role = newUser.role;
+          token.id = newUser._id.toString();
         } else {
           token.role = existingUser.role;
+          token.id = existingUser._id.toString();
         }
       }
 
-      if (user?.role) {
+      if (user) {
         token.role = user.role;
+        token.id = user.id?.toString();
       }
 
       return token;
@@ -68,6 +71,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.role = token.role;
+        session.user.id = token.id;
       }
       return session;
     },
