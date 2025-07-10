@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     name,
     email,
     password: hashedPassword,
-    role: role || "buyer",
+    role: role || "customer",
   });
 
   return NextResponse.json({ message: "User registered", user });
