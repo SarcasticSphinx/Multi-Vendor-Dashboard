@@ -35,7 +35,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       //specific admin role
-      const role = email === "suhail.admin@gmail.com" ? "seller" : "buyer";
+      const role = email === "suhail.admin@gmail.com" ? "seller" : "customer";
 
       const res = await fetch("/api/register", {
         method: "POST",
