@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Upload, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import uploadToImgBB from "@/lib/imgbb";
+import uploadToCloudinary from "@/lib/cloudinary";
 import Image from "next/image";
 import axiosInstance from "@/lib/axios";
 import { toast } from "react-toastify";
@@ -152,7 +152,7 @@ const AddProductPage: React.FC = () => {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = await uploadToImgBB(file);
+      const url = await uploadToCloudinary(file);
       // console.log(url)
       if (url) {
         setFormData((prev) => ({

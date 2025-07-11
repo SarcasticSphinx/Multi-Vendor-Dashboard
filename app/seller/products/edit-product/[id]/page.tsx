@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
 import Product from "../../../../../models/Product.model";
 import Image from "next/image";
-import uploadToImgBB from "@/lib/imgbb";
+import uploadToCloudinary from "@/lib/cloudinary";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -129,7 +129,7 @@ const EditProductPage = ({ params }: PageProps) => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = await uploadToImgBB(file);
+      const url = await uploadToCloudinary(file);
       // console.log(url)
       if (url) {
         setProduct((prev) => ({

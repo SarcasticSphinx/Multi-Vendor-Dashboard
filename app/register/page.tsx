@@ -4,14 +4,14 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { signIn } from "next-auth/react";
-import uploadToImgBB from "@/lib/imgbb";
+import uploadToCloudinary from "@/lib/cl";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [image, setImage] = useState('')
+  const [image, setImage] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,13 +19,14 @@ export default function RegisterPage() {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = await uploadToImgBB(file);
+      const url = await uploadToCloudinary(file);
       // console.log(url);
       if (!url) {
         toast("Image upload failed");
         return;
       }
-      setImage(url);    }
+      setImage(url);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
