@@ -151,7 +151,7 @@ const productSchema = new mongoose.Schema(
     // Vendor Information
     sellerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Seller",
       required: true,
     },
   },

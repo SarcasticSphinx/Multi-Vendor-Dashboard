@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { signIn } from "next-auth/react";
-import uploadToCloudinary from "@/lib/cl";
+import uploadToCloudinary from "@/lib/cloudinary";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
