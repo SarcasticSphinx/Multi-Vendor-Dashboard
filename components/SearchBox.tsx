@@ -45,7 +45,7 @@ const SearchBox = () => {
           <Link href="/customer/my-cart">
             <Button variant={"ghost"} className="flex items-center gap-2">
               <ShoppingCart />
-              Orders
+              Cart
             </Button>
           </Link>
         </div>

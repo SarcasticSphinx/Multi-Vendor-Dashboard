@@ -60,9 +60,9 @@ const MyCart = () => {
         setLoading(true);
         if (!session?.user.id) return;
         const response = await axiosInstance.get(
-          `/customer/fetch-by-userId/${session?.user.id}`
+          `/customer/cart/${session?.user.id}`
         );
-        setCustomerCart(response.data.cartProducts);
+        setCustomerCart(response.data);
       } catch (error) {
         console.log("Failed to fetch customer cart:", error);
       } finally {
@@ -74,7 +74,7 @@ const MyCart = () => {
 
   // Group cart items by seller
   const groupedCart = customerCart.reduce<Record<string, CartProduct[]>>((acc, item) => {
-    const sellerName = item.productId.sellerId.storeName;
+    const sellerName = item.productId.sellerId.storeName || "Unknown Seller";
     if (!acc[sellerName]) acc[sellerName] = [];
     acc[sellerName].push(item);
     return acc;
@@ -83,12 +83,11 @@ const MyCart = () => {
   const updateCartItem = async (itemId: string, newQuantity: number) => {
     try {
       setUpdating(true);
-      const response = await axiosInstance.put(`/customer/update-cart-item`, {
-        userId: session?.user.id,
-        cartItemId: itemId,
+      const response = await axiosInstance.put(`/customer/cart/update-customer-cart/${session?.user.id}`, {
+        productId: itemId,
         quantity: newQuantity,
       });
-      setCustomerCart(response.data.cartProducts);
+      setCustomerCart(response.data);
     } catch (error) {
       console.error("Error updating cart item:", error);
     } finally {
@@ -100,13 +99,7 @@ const MyCart = () => {
     try {
       setUpdating(true);
       const response = await axiosInstance.delete(
-        `/customer/remove-cart-item`,
-        {
-          data: {
-            userId: session?.user.id,
-            cartItemId: itemId,
-          },
-        }
+        `/customer/cart/update-customer-cart/${session?.user.id}?productId=${itemId}`,
       );
       setCustomerCart(response.data.cartProducts);
       setSelectedItems((prev) => prev.filter((id) => id !== itemId));
@@ -249,7 +242,7 @@ const MyCart = () => {
                         <button
                           className="w-7 h-7 rounded border flex items-center justify-center text-gray-500 hover:bg-gray-100"
                           disabled={item.quantity <= 1 || updating}
-                          onClick={() => updateCartItem(item._id, item.quantity - 1)}
+                          onClick={() => updateCartItem(item.productId._id, item.quantity - 1)}
                         >
                           –
                         </button>
@@ -257,14 +250,14 @@ const MyCart = () => {
                         <button
                           className="w-7 h-7 rounded border flex items-center justify-center text-gray-500 hover:bg-gray-100"
                           disabled={updating}
-                          onClick={() => updateCartItem(item._id, item.quantity + 1)}
+                          onClick={() => updateCartItem(item.productId._id, item.quantity + 1)}
                         >
                           +
                         </button>
                       </div>
                       <button
                         className="ml-4 text-red-500 hover:text-red-700"
-                        onClick={() => removeCartItem(item._id)}
+                        onClick={() => removeCartItem(item.productId._id)}
                         disabled={updating}
                         aria-label="Remove"
                       >

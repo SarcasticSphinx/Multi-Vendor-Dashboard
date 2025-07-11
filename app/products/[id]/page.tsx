@@ -80,8 +80,8 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
   async function handleAddToCart() {
     if (!product) return;
     try {
-      await axiosInstance.patch(
-        `/customer/add-to-cart/${session?.user.id}?productId=${product._id}&quantity=${quantity}`
+      await axiosInstance.post(
+        `/customer/cart/update-customer-cart/${session?.user.id}?productId=${product._id}&quantity=${quantity}`
       );
       toast.success("Product added to cart successfully!");
     } catch (error) {
