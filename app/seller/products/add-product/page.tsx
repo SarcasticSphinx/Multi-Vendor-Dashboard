@@ -28,6 +28,7 @@ interface ProductForm {
   tags: string[];
   seoTitle: string;
   seoDescription: string;
+  sellerId: string;
 }
 
 const AddProductPage: React.FC = () => {
@@ -54,6 +55,7 @@ const AddProductPage: React.FC = () => {
     tags: [],
     seoTitle: "",
     seoDescription: "",
+    sellerId: ''
   });
 
   const [dragActive, setDragActive] = useState(false);
