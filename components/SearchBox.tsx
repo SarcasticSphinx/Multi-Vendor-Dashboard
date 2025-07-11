@@ -4,11 +4,9 @@ import { ChevronDown, Heart, ShoppingCart } from "lucide-react";
 import { FiSearch } from "react-icons/fi";
 import { useSession } from "next-auth/react";
 import { Button } from "./ui/button";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const SearchBox = () => {
-  const router = useRouter();
   const { data: session } = useSession();
   return (
     <form className="flex items-center  p-4 lg:px-20 shadow-sm bg-white fixed top-16 left-0 z-50 w-full  mx-auto border border-gray-200">
