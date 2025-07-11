@@ -4,19 +4,20 @@ import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 type Params = Promise<{ id: string }>;
 
-export async function PATCH(
-  req: NextRequest,
-  context: { params: Params }
-) {
+export async function PATCH(req: NextRequest, context: { params: Params }) {
   try {
     await connectToMongoDB();
     const params = await context.params;
     const { id } = params;
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get("productId");
+    const quantity = parseInt(searchParams.get("quantity") || "1")
 
-    console.log('product id: ', productId)
-    console.log('customer id: ', id)
+    console.log("product id: ", productId);
+    console.log("user id: ", id);
+    console.log("quantity: ", quantity);
+
+    // await axiosInstance.patch(`/customer/add-to-cart/${session?.user.id}?productId=${product._id}&quantity=${quantity}`);
 
     if (!productId) {
       return NextResponse.json(
@@ -27,11 +28,18 @@ export async function PATCH(
 
     const updatedCustomer = await Customer.findOneAndUpdate(
       { user: new mongoose.Types.ObjectId(id) },
-      { $push: { cartProducts: new mongoose.Types.ObjectId(productId) } },
+      {
+        $push: {
+          cartProducts: {
+            productId: new mongoose.Types.ObjectId(productId),
+            quantity: quantity,
+          },
+        },
+      },
       { new: true }
     );
 
-    console.log(updatedCustomer, "updatedCustomer");
+    // console.log(updatedCustomer, "updatedCustomer");
 
     if (!updatedCustomer) {
       return NextResponse.json(

@@ -74,7 +74,8 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
     fetchProducts();
   }, [id]);
 
-  // console.log(customerId, "customerId");
+  // console.log(session?.user?.id, "session user id");
+  
 
   async function handleAddToCart() {
     if (!product) return;
