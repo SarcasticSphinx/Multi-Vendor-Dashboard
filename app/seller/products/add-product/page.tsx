@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft, Upload, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import uploadToImgBB from "@/lib/imgbb";
@@ -35,6 +35,20 @@ const AddProductPage: React.FC = () => {
   const router = useRouter();
   const { data: session } = useSession();
 
+  const [sellerId, setSellerId] = useState<string>("");
+
+  useEffect(() => {
+    const fetchSellerId = async () => {
+      try {
+        const response = await axiosInstance.get(`/seller/${session?.user.id}`);
+        setSellerId(response.data._id);
+      } catch (error) {
+        console.error("Failed to fetch seller ID:", error);
+      }
+    };
+    fetchSellerId();
+  }, [session?.user.id]);
+
   const [formData, setFormData] = useState<ProductForm>({
     productTitle: "",
     description: "",
@@ -55,7 +69,7 @@ const AddProductPage: React.FC = () => {
     tags: [],
     seoTitle: "",
     seoDescription: "",
-    sellerId: ''
+    sellerId: sellerId,
   });
 
   const [dragActive, setDragActive] = useState(false);
@@ -155,7 +169,7 @@ const AddProductPage: React.FC = () => {
     try {
       await axiosInstance.post("/products", {
         ...formData,
-        sellerId: session?.user.id, 
+        sellerId: session?.user.id,
       });
       router.push("/seller/products");
       toast.success("Product submitted successfully!");
