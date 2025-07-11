@@ -14,10 +14,12 @@ export async function GET(req: NextRequest, context: { params: Params }) {
 
     const customer = await Customer.findOne({
       user: new mongoose.Types.ObjectId(id),
-    }).populate("cartProducts.productId");
-    console.log(customer, "Customer fetched by user ID");
+    })
+    .populate({ path: "cartProducts.productId", model: "Product" });
 
-    return NextResponse.json(customer.cartProducts);
+    // console.log(customer, "Customer fetched by user ID");
+
+    return NextResponse.json(customer);
   } catch (error) {
     console.error("Fetch Customer Error:", error);
     const message =

@@ -38,24 +38,25 @@ const MyCart = () => {
   const [customerCart, setCustomerCart] = useState<CartProduct[]>([]);
 
   useEffect(() => {
-    const fetchCustomerCartIds = async () => {
+    const fetchCustomerCart = async () => {
       try {
-        if (!session?.user?.id) {
+        if (!session?.user.id) {
           console.error("User ID is not available in session");
           return;
         }
         const response = await axiosInstance.get(
-          `/customer/fetch-by-userId/${session?.user?.id}`
+          `/customer/fetch-by-userId/${session?.user.id}`
         );
         setCustomerCart(response.data.cartProducts);
+        // console.log(response.data.cartProducts, "Customer Cart fetch request Data");
       } catch (error) {
         console.log("Failed to fetch customer cart IDs:", error);
       }
     };
-    fetchCustomerCartIds();
+    fetchCustomerCart();
   }, [session?.user?.id]);
   console.log("Customer Cart Items: ", customerCart);
-  return <div>{customerCart.length}</div>;
+  return <div>{}</div>;
 };
 
 export default MyCart;
