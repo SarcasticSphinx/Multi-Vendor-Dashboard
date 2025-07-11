@@ -35,19 +35,24 @@ const AddProductPage: React.FC = () => {
   const router = useRouter();
   const { data: session } = useSession();
 
-  const [sellerId, setSellerId] = useState<string>("");
-
   useEffect(() => {
     const fetchSellerId = async () => {
+      if (!session?.user.id) return;
       try {
         const response = await axiosInstance.get(`/seller/${session?.user.id}`);
-        setSellerId(response.data._id);
+
+        setFormData((prev) => ({
+          ...prev,
+          sellerId: response.data._id,
+        }));
       } catch (error) {
         console.error("Failed to fetch seller ID:", error);
       }
     };
     fetchSellerId();
   }, [session?.user.id]);
+
+  // console.log(sellerId);
 
   const [formData, setFormData] = useState<ProductForm>({
     productTitle: "",
@@ -69,8 +74,10 @@ const AddProductPage: React.FC = () => {
     tags: [],
     seoTitle: "",
     seoDescription: "",
-    sellerId: sellerId,
+    sellerId: '',
   });
+
+  console.log(formData.sellerId);
 
   const [dragActive, setDragActive] = useState(false);
 
@@ -169,7 +176,6 @@ const AddProductPage: React.FC = () => {
     try {
       await axiosInstance.post("/products", {
         ...formData,
-        sellerId: session?.user.id,
       });
       router.push("/seller/products");
       toast.success("Product submitted successfully!");

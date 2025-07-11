@@ -1,13 +1,19 @@
 import { connectToMongoDB } from "@/lib/mongoose";
 import Product from "@/models/Product.model";
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from 'mongoose';
 
 export async function GET(req: NextRequest) {
   try {
     await connectToMongoDB();
     const { searchParams } = new URL(req.url);
     const sellerId = searchParams.get("sellerId");
-    const query = sellerId || {};
+
+    const query: { sellerId?: mongoose.Types.ObjectId } = {};
+    if (sellerId && mongoose.Types.ObjectId.isValid(sellerId)) {
+      query.sellerId = new mongoose.Types.ObjectId(sellerId);
+    }
+
     const products = await Product.find(query).sort({ createdAt: -1 });
     return NextResponse.json(products);
   } catch (error) {
@@ -19,6 +25,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 
 export async function POST(req: NextRequest) {
   try {

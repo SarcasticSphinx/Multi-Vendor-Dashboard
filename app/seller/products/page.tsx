@@ -1,7 +1,7 @@
 "use client";
 import Loading from "@/components/Loading";
 import axiosInstance from "@/lib/axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Search, Edit, Trash2, ChevronDown, TriangleAlert } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,6 +22,23 @@ interface Product {
 
 const ProductsPage = () => {
   const {data: session} = useSession();
+  const [sellerId, setSellerId] = useState<string>("");
+
+  useEffect(()=> {
+    const fetchSellerId = async () => {
+      if (!session?.user.id) return;
+      try {
+        const response = await axiosInstance.get(`/seller/${session?.user.id}`);
+        setSellerId(response.data._id);
+      } catch (error) {
+        console.error("Failed to fetch seller ID:", error);
+      }
+    };
+    fetchSellerId();
+  }, [session?.user.id]);
+
+  // console.log(sellerId)
+
   // console.log(session?.user.id, "Session User ID");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +67,6 @@ const ProductsPage = () => {
   const fetchProducts = React.useCallback(async () => {
     setLoading(true);
     try {
-      const sellerId = session?.user?.id;
       if (!sellerId) {
         console.log("No seller ID found in session");
         setLoading(false);
@@ -63,7 +79,7 @@ const ProductsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id]);
+  }, [sellerId]);
 
   React.useEffect(() => {
     fetchProducts();
