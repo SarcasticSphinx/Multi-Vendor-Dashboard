@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Trash2, ArrowRight, Tag, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
+import Link from "next/link";
 
 interface Seller {
   _id: string;
@@ -47,12 +48,15 @@ interface CartProduct {
 const MyCart = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const [customerId, setCustomerId] = useState<string | null>(null);
   const [customerCart, setCustomerCart] = useState<CartProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [selectedAll, setSelectedAll] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [promoCode, setPromoCode] = useState("");
+
+  // console.log(selectedItems, "Selected Items in MyCart");
 
   useEffect(() => {
     const fetchCustomerCart = async () => {
@@ -62,7 +66,8 @@ const MyCart = () => {
         const response = await axiosInstance.get(
           `/customer/cart/${session?.user.id}`
         );
-        setCustomerCart(response.data);
+        setCustomerCart(response.data.cartProducts);
+        setCustomerId(response.data.customerId);
       } catch (error) {
         console.log("Failed to fetch customer cart:", error);
       } finally {
@@ -73,20 +78,26 @@ const MyCart = () => {
   }, [session?.user?.id]);
 
   // Group cart items by seller
-  const groupedCart = customerCart.reduce<Record<string, CartProduct[]>>((acc, item) => {
-    const sellerName = item.productId.sellerId.storeName || "Unknown Seller";
-    if (!acc[sellerName]) acc[sellerName] = [];
-    acc[sellerName].push(item);
-    return acc;
-  }, {});
+  const groupedCart = customerCart.reduce<Record<string, CartProduct[]>>(
+    (acc, item) => {
+      const sellerName = item.productId.sellerId.storeName || "Unknown Seller";
+      if (!acc[sellerName]) acc[sellerName] = [];
+      acc[sellerName].push(item);
+      return acc;
+    },
+    {}
+  );
 
   const updateCartItem = async (itemId: string, newQuantity: number) => {
     try {
       setUpdating(true);
-      const response = await axiosInstance.put(`/customer/cart/update-customer-cart/${session?.user.id}`, {
-        productId: itemId,
-        quantity: newQuantity,
-      });
+      const response = await axiosInstance.put(
+        `/customer/cart/update-customer-cart/${session?.user.id}`,
+        {
+          productId: itemId,
+          quantity: newQuantity,
+        }
+      );
       setCustomerCart(response.data);
     } catch (error) {
       console.error("Error updating cart item:", error);
@@ -99,7 +110,7 @@ const MyCart = () => {
     try {
       setUpdating(true);
       const response = await axiosInstance.delete(
-        `/customer/cart/update-customer-cart/${session?.user.id}?productId=${itemId}`,
+        `/customer/cart/update-customer-cart/${session?.user.id}?productId=${itemId}`
       );
       setCustomerCart(response.data.cartProducts);
       setSelectedItems((prev) => prev.filter((id) => id !== itemId));
@@ -121,12 +132,13 @@ const MyCart = () => {
     if (selectedAll) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(customerCart.map((item) => item._id));
+      setSelectedItems(customerCart.map((item) => item.productId._id));
     }
     setSelectedAll(!selectedAll);
   };
 
   const handleSelectItem = (itemId: string) => {
+    // console.log("Selected Item ID:", itemId);
     setSelectedItems((prev) =>
       prev.includes(itemId)
         ? prev.filter((id) => id !== itemId)
@@ -135,7 +147,9 @@ const MyCart = () => {
   };
 
   useEffect(() => {
-    setSelectedAll(selectedItems.length === customerCart.length && customerCart.length > 0);
+    setSelectedAll(
+      selectedItems.length === customerCart.length && customerCart.length > 0
+    );
   }, [selectedItems, customerCart.length]);
 
   const handleDeleteSelected = async () => {
@@ -194,13 +208,24 @@ const MyCart = () => {
                 <div className="flex items-center px-4 pt-4 pb-2 border-b">
                   <input
                     type="checkbox"
-                    checked={items.every((item) => selectedItems.includes(item._id))}
+                    checked={items.every((item) =>
+                      selectedItems.includes(item._id)
+                    )}
                     onChange={() => {
-                      const allSelected = items.every((item) => selectedItems.includes(item._id));
+                      const allSelected = items.every((item) =>
+                        selectedItems.includes(item._id)
+                      );
                       setSelectedItems((prev) =>
                         allSelected
-                          ? prev.filter((id) => !items.map((i) => i._id).includes(id))
-                          : [...prev, ...items.map((i) => i._id).filter((id) => !prev.includes(id))]
+                          ? prev.filter(
+                              (id) => !items.map((i) => i._id).includes(id)
+                            )
+                          : [
+                              ...prev,
+                              ...items
+                                .map((i) => i._id)
+                                .filter((id) => !prev.includes(id)),
+                            ]
                       );
                     }}
                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
@@ -214,11 +239,14 @@ const MyCart = () => {
                   const product = item.productId;
                   const currentPrice = product.salePrice || product.price;
                   return (
-                    <div key={item._id} className="flex items-center px-4 py-4 border-b last:border-b-0">
+                    <div
+                      key={product._id}
+                      className="flex items-center px-4 py-4 border-b last:border-b-0"
+                    >
                       <input
                         type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        onChange={() => handleSelectItem(item._id)}
+                        checked={selectedItems.includes(product._id)}
+                        onChange={() => handleSelectItem(product._id)}
                         className="h-4 w-4 mr-2 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                       />
                       <div className="relative w-16 h-16 bg-gray-200 rounded overflow-hidden mr-4">
@@ -236,13 +264,20 @@ const MyCart = () => {
                         <div className="text-xs text-gray-500 mb-1">
                           {product.colour} | {product.model} Edition
                         </div>
-                        <div className="font-bold text-lg">${currentPrice.toFixed(2)}</div>
+                        <div className="font-bold text-lg">
+                          ${currentPrice.toFixed(2)}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2 ml-4">
                         <button
                           className="w-7 h-7 rounded border flex items-center justify-center text-gray-500 hover:bg-gray-100"
                           disabled={item.quantity <= 1 || updating}
-                          onClick={() => updateCartItem(item.productId._id, item.quantity - 1)}
+                          onClick={() =>
+                            updateCartItem(
+                              item.productId._id,
+                              item.quantity - 1
+                            )
+                          }
                         >
                           –
                         </button>
@@ -250,7 +285,12 @@ const MyCart = () => {
                         <button
                           className="w-7 h-7 rounded border flex items-center justify-center text-gray-500 hover:bg-gray-100"
                           disabled={updating}
-                          onClick={() => updateCartItem(item.productId._id, item.quantity + 1)}
+                          onClick={() =>
+                            updateCartItem(
+                              item.productId._id,
+                              item.quantity + 1
+                            )
+                          }
                         >
                           +
                         </button>
@@ -312,10 +352,17 @@ const MyCart = () => {
               <span>${calculateSubtotal().toFixed(2)}</span>
             </div>
           </div>
-          <Button className="w-full bg-secondary hover:bg-secondary/80 text-white mb-2 rounded-sm">
-            Proceed to Checkout
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          {selectedItems.length > 0 && (
+            <Link
+              className="w-full bg-secondary hover:bg-secondary/80 text-white mb-2 rounded-sm flex items-center justify-center py-2"
+              href={`/customer/checkout?customerId=${customerId}&selectedItems=${encodeURIComponent(
+                JSON.stringify(selectedItems)
+              )}`}
+            >
+              Proceed to Checkout
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          )}
         </div>
       </div>
     </div>

@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
 
     // console.log(customer, "Customer fetched by user ID");
 
-    return NextResponse.json(customer.cartProducts);
+    return NextResponse.json({ customerId: customer._id, cartProducts: customer.cartProducts });
   } catch (error) {
     console.error("Fetch Customer Error:", error);
     const message =
