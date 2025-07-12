@@ -7,7 +7,6 @@ export async function POST(req: NextRequest) {
   try {
     await connectToMongoDB();
     const formData = await req.json();
-    console.log("Received order data:", formData);
     const createdOrder = await Order.create(formData);
 
     return NextResponse.json(createdOrder);

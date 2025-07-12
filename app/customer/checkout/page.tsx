@@ -158,6 +158,23 @@ const fetchProductsByIds = async (ids: string[]): Promise<Product[]> => {
   }
 };
 
+const deleteCheckoutProductsFromCustomerCart = async (
+  userId: string,
+  ids: string[]
+) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/customer/cart/update-customer-cart/${userId}`,
+      {
+        params: { ids: ids.join(",") },
+      }
+    );
+    return response.data.products;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
+
 const fetchCustomer = async (id: string): Promise<CustomerInterface> => {
   try {
     const response = await axiosInstance.get(`/customer/${id}`);
@@ -321,10 +338,24 @@ const CheckOutPage: React.FC = () => {
         },
       };
 
+      //delete the ordered products from customer cart
+      if (session?.user.id) {
+        const productIds = selectedItems.map((item) => item.productId);
+        deleteCheckoutProductsFromCustomerCart(
+          session?.user.id,
+          productIds
+        ).then(() => {
+          setCheckoutProducts([]);
+          setSelectedItems([]); 
+        });
+      }
+
       const response = await axiosInstance.post("/order", orderData);
+
       if (response.status === 200) {
         console.log("Order created successfully:", response.data);
         toast.success("Order created successfully!");
+        router.push('/customer/my-orders')
       } else {
         console.error("Failed to create order:", response.data);
         toast.error("Failed to create order. Please try again.");

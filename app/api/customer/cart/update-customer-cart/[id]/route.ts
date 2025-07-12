@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 type Params = Promise<{ id: string }>;
 
+
+
 export async function POST(req: NextRequest, context: { params: Params }) {
   try {
     await connectToMongoDB();
@@ -108,10 +110,10 @@ export async function PUT(req: NextRequest, context: { params: Params }) {
     const populatedCustomer = await Customer.findById(updatedCustomer._id)
       .populate({
         path: "cartProducts.productId",
-        model: "Product", 
+        model: "Product",
         populate: {
           path: "sellerId",
-          model: "Seller", 
+          model: "Seller",
         },
       })
       .exec();
@@ -141,40 +143,113 @@ export async function DELETE(req: NextRequest, context: { params: Params }) {
     await connectToMongoDB();
     const params = await context.params;
     const { id } = params;
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("productId");
 
-    if (!productId) {
+    // Validate customerId from path parameter
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        { error: "Missing productId in query" },
+        { message: `Invalid customer ID format: ${id}` },
         { status: 400 }
       );
     }
 
-    const updatedCustomer = await Customer.findOneAndUpdate(
-      { user: new mongoose.Types.ObjectId(id) },
-      {
+    const { searchParams } = new URL(req.url);
+    const singleProductId = searchParams.get("productId"); // Query for single product
+    const multipleProductIdsParam = searchParams.get("ids"); // Query for multiple products
+
+    let updateOperation
+    let returnUpdatedProducts = false; 
+
+    if (multipleProductIdsParam) {
+      // --- Case 1: Handle multiple product IDs deletion ---
+      const idStrings = multipleProductIdsParam.split(",");
+      const validProductObjectIds: mongoose.Types.ObjectId[] = [];
+
+      idStrings.forEach((idStr) => {
+        if (mongoose.Types.ObjectId.isValid(idStr)) {
+          validProductObjectIds.push(new mongoose.Types.ObjectId(idStr));
+        }
+      });
+
+      if (validProductObjectIds.length === 0 && idStrings.length > 0) {
+        return NextResponse.json(
+          { message: "No valid product IDs provided for deletion." },
+          { status: 400 }
+        );
+      }
+
+      // Use $pull with $in to remove multiple items from an array of objects
+      updateOperation = {
         $pull: {
           cartProducts: {
-            productId: new mongoose.Types.ObjectId(productId),
+            productId: { $in: validProductObjectIds },
           },
         },
-      },
-      { new: true }
+      };
+      // For this case, we *do not* return the updated products
+      returnUpdatedProducts = false;
+    } else if (singleProductId) {
+      // --- Case 2: Handle single product ID deletion ---
+      if (!mongoose.Types.ObjectId.isValid(singleProductId)) {
+        return NextResponse.json(
+          { message: `Invalid productId format: ${singleProductId}` },
+          { status: 400 }
+        );
+      }
+
+      // Use $pull to remove a single element from an array of objects
+      updateOperation = {
+        $pull: {
+          cartProducts: {
+            productId: new mongoose.Types.ObjectId(singleProductId),
+          },
+        },
+      };
+      // For this case, we *do* return the updated products
+      returnUpdatedProducts = true;
+    } else {
+      // Neither 'productId' nor 'ids' query parameter was provided
+      return NextResponse.json(
+        {
+          message: "Missing 'productId' or 'ids' query parameter for deletion.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Perform the update operation on the customer's cart
+    const updatedCustomer = await Customer.findOneAndUpdate(
+      { user: new mongoose.Types.ObjectId(id) }, // Finds the customer by their associated user ID
+      updateOperation,
+      { new: true } // Return the updated document
     );
 
     if (!updatedCustomer) {
       return NextResponse.json(
-        { error: "customer not found" },
+        { message: "Customer not found." },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(updatedCustomer);
+    if (returnUpdatedProducts) {
+      return NextResponse.json(
+        { products: updatedCustomer.cartProducts },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json(
+        { message: "Products successfully removed from cart." },
+        { status: 200 } 
+      );
+    }
   } catch (error) {
-    console.error("Error in DELETE /customer/remove-from-cart route:", error);
+    console.error(
+      "Error in DELETE /cart/update-customer-cart/[id] route:",
+      error
+    );
+    const message =
+      error instanceof Error ? error.message : "Unknown server error";
     return NextResponse.json(
-      { message: "Failed to remove product from cart", error },
+      { message: "Failed to remove product(s) from cart", details: message },
       { status: 500 }
     );
   }
