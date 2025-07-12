@@ -49,7 +49,7 @@ export default function CustomerHomePage() {
   const fetchProducts = async () => {
     try {
       const response = await axiosInstance.get("/products");
-      setProducts(response.data);
+      setProducts(response.data.products);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {

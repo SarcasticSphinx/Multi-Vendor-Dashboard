@@ -12,6 +12,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
     await connectToMongoDB();
     const customer = await Customer.findOne({ user: id }).populate("user");
 
+    // console.log('received request for customer with id:', id);
     return NextResponse.json(customer);
   } catch (error) {
     const message =

@@ -45,6 +45,11 @@ interface CartProduct {
   _id: string;
 }
 
+interface SelectedItem {
+  productId: string;
+  quantity: number;
+}
+
 const MyCart = () => {
   const { data: session } = useSession();
   const router = useRouter();
@@ -53,7 +58,7 @@ const MyCart = () => {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [selectedAll, setSelectedAll] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [promoCode, setPromoCode] = useState("");
 
   // console.log(selectedItems, "Selected Items in MyCart");
@@ -99,6 +104,15 @@ const MyCart = () => {
         }
       );
       setCustomerCart(response.data);
+      
+      // Update selected items quantity if this item is selected
+      setSelectedItems((prev) =>
+        prev.map((item) =>
+          item.productId === itemId
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
     } catch (error) {
       console.error("Error updating cart item:", error);
     } finally {
@@ -113,7 +127,7 @@ const MyCart = () => {
         `/customer/cart/update-customer-cart/${session?.user.id}?productId=${itemId}`
       );
       setCustomerCart(response.data.cartProducts);
-      setSelectedItems((prev) => prev.filter((id) => id !== itemId));
+      setSelectedItems((prev) => prev.filter((item) => item.productId !== itemId));
     } catch (error) {
       console.error("Error removing cart item:", error);
     } finally {
@@ -132,18 +146,32 @@ const MyCart = () => {
     if (selectedAll) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(customerCart.map((item) => item.productId._id));
+      setSelectedItems(
+        customerCart.map((item) => ({
+          productId: item.productId._id,
+          quantity: item.quantity,
+        }))
+      );
     }
     setSelectedAll(!selectedAll);
   };
 
-  const handleSelectItem = (itemId: string) => {
-    // console.log("Selected Item ID:", itemId);
-    setSelectedItems((prev) =>
-      prev.includes(itemId)
-        ? prev.filter((id) => id !== itemId)
-        : [...prev, itemId]
-    );
+  const handleSelectItem = (productId: string, quantity: number) => {
+    setSelectedItems((prev) => {
+      const existingIndex = prev.findIndex((item) => item.productId === productId);
+      
+      if (existingIndex !== -1) {
+        // Item is already selected, remove it
+        return prev.filter((item) => item.productId !== productId);
+      } else {
+        // Item is not selected, add it
+        return [...prev, { productId, quantity }];
+      }
+    });
+  };
+
+  const isItemSelected = (productId: string): boolean => {
+    return selectedItems.some((item) => item.productId === productId);
   };
 
   useEffect(() => {
@@ -153,8 +181,8 @@ const MyCart = () => {
   }, [selectedItems, customerCart.length]);
 
   const handleDeleteSelected = async () => {
-    for (const itemId of selectedItems) {
-      await removeCartItem(itemId);
+    for (const item of selectedItems) {
+      await removeCartItem(item.productId);
     }
     setSelectedItems([]);
   };
@@ -209,24 +237,32 @@ const MyCart = () => {
                   <input
                     type="checkbox"
                     checked={items.every((item) =>
-                      selectedItems.includes(item._id)
+                      isItemSelected(item.productId._id)
                     )}
                     onChange={() => {
                       const allSelected = items.every((item) =>
-                        selectedItems.includes(item._id)
+                        isItemSelected(item.productId._id)
                       );
-                      setSelectedItems((prev) =>
-                        allSelected
-                          ? prev.filter(
-                              (id) => !items.map((i) => i._id).includes(id)
-                            )
-                          : [
-                              ...prev,
-                              ...items
-                                .map((i) => i._id)
-                                .filter((id) => !prev.includes(id)),
-                            ]
-                      );
+                      
+                      if (allSelected) {
+                        // Deselect all items from this seller
+                        setSelectedItems((prev) =>
+                          prev.filter(
+                            (selectedItem) =>
+                              !items.some((item) => item.productId._id === selectedItem.productId)
+                          )
+                        );
+                      } else {
+                        // Select all items from this seller
+                        const newSelections = items
+                          .filter((item) => !isItemSelected(item.productId._id))
+                          .map((item) => ({
+                            productId: item.productId._id,
+                            quantity: item.quantity,
+                          }));
+                        
+                        setSelectedItems((prev) => [...prev, ...newSelections]);
+                      }
                     }}
                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
@@ -245,8 +281,8 @@ const MyCart = () => {
                     >
                       <input
                         type="checkbox"
-                        checked={selectedItems.includes(product._id)}
-                        onChange={() => handleSelectItem(product._id)}
+                        checked={isItemSelected(product._id)}
+                        onChange={() => handleSelectItem(product._id, item.quantity)}
                         className="h-4 w-4 mr-2 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                       />
                       <div className="relative w-16 h-16 bg-gray-200 rounded overflow-hidden mr-4">
