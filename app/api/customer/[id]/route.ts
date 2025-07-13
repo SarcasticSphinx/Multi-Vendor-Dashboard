@@ -1,11 +1,12 @@
 import { connectToMongoDB } from "@/lib/mongoose";
 import Customer from "@/models/Customer.model";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 type Params = Promise<{ id: string }>;
 
 export async function GET(req: NextRequest, context: { params: Params }) {
-  const params = await context.params
+  const params = await context.params;
   const id = params.id;
 
   try {
@@ -24,18 +25,22 @@ export async function GET(req: NextRequest, context: { params: Params }) {
   }
 }
 
-export async function PATCH(
-  req: NextRequest,
-  context: {params: Params}
-) {
+export async function PUT(req: NextRequest, context: { params: Params }) {
   try {
     await connectToMongoDB();
     const params = await context.params;
-    const { id } = params;
+    const id = params.id;
     const updates = await req.json();
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: `Invalid customer ID format: ${id}` },
+        { status: 400 }
+      );
+    }
+
     const updatedCustomer = await Customer.findOneAndUpdate(
-      { user: id },
+      { user: new mongoose.Types.ObjectId(id) },
       updates,
       {
         new: true,
@@ -44,13 +49,14 @@ export async function PATCH(
 
     if (!updatedCustomer) {
       return NextResponse.json(
-        { error: "customer not found" },
+        { error: "Customer not found" }, 
         { status: 404 }
       );
     }
 
     return NextResponse.json(updatedCustomer);
   } catch (error) {
+    console.error("Error updating customer:", error); 
     const message =
       error instanceof Error ? error.message : "Unknown server error";
     return NextResponse.json(
@@ -60,10 +66,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  context: { params: Params }
-) {
+export async function DELETE(req: NextRequest, context: { params: Params }) {
   try {
     await connectToMongoDB();
     const params = await context.params;

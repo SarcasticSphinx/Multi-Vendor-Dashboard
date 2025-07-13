@@ -2,12 +2,19 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Edit, Trash2, Star, Download } from "lucide-react";
+import { MapPin, Edit, Trash2, Star, Download, Plus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axios";
 import Loading from "@/components/Loading";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "react-toastify";
 
 interface PopulatedUser {
   _id: string;
@@ -34,42 +41,39 @@ interface NotificationPreferences {
   wishlistUpdates: boolean;
 }
 
-// interface PopulatedProduct {
-//   _id: string;
-//   name: string;
-//   price: number;
-//   imageUrl?: string;
-// }
-
 interface RecentActivity {
   title: string;
   description?: string;
   time: string;
 }
+
+interface Transaction {
+  _id: string;
+  amount: number;
+  status: "Paid" | "Pending" | "Failed";
+  date: string;
+  transactionId: string;
+  productName?: string;
+  description?: string;
+}
+
 interface CustomerInterface {
   _id?: string;
   user: PopulatedUser;
-
   firstName?: string;
   lastName?: string;
   phone?: string;
   bio?: string;
-
   notificationPreferences?: NotificationPreferences;
-
   addresses?: Address[];
-
   orders?: string[];
-  transactions?: string[];
+  transactions?: Transaction[];
   wishlist?: string[];
   coupons?: string[];
-
   recent_activities?: RecentActivity[];
 }
 
-const fetchCustomerProfile = async (
-  userId: string
-): Promise<CustomerInterface | null> => {
+const fetchCustomerProfile = async (userId: string): Promise<CustomerInterface | null> => {
   try {
     const response = await axiosInstance(`/customer/${userId}`);
     return response.data;
@@ -79,11 +83,168 @@ const fetchCustomerProfile = async (
   }
 };
 
+const AddressDialog = ({
+  onOpenChange,
+  onSave,
+  initialAddress
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSave: (address: Address) => Promise<void>;
+  initialAddress: Address;
+}) => {
+  const [address, setAddress] = useState<Address>(initialAddress);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setAddress(initialAddress);
+  }, [initialAddress]);
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      await onSave(address);
+      onOpenChange(false);
+      toast('Address saved successfully')
+    } catch (error) {
+      console.log("Failed to save address:", error);
+      toast.error('Failed to save address');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>{initialAddress.street ? "Edit Address" : "Add New Address"}</DialogTitle>
+      </DialogHeader>
+      <div className="grid gap-4 py-4">
+        <div className="grid gap-2">
+          <Label htmlFor="type">Address Type</Label>
+          <Select
+            value={address.type}
+            onValueChange={(value) => setAddress(prev => ({ ...prev, type: value as "Home" | "Work" | "Other" }))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select address type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Home">Home</SelectItem>
+              <SelectItem value="Work">Work</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="street">Street Address</Label>
+          <Input
+            id="street"
+            placeholder="123 Main Street"
+            value={address.street || ""}
+            onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="grid gap-2">
+            <Label htmlFor="city">City</Label>
+            <Input
+              id="city"
+              placeholder="New York"
+              value={address.city || ""}
+              onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="state">State</Label>
+            <Input
+              id="state"
+              placeholder="Dhaka"
+              value={address.state || ""}
+              onChange={(e) => setAddress(prev => ({ ...prev, state: e.target.value }))}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="grid gap-2">
+            <Label htmlFor="zipCode">ZIP Code</Label>
+            <Input
+              id="zipCode"
+              placeholder="3500"
+              value={address.zipCode || ""}
+              onChange={(e) => setAddress(prev => ({ ...prev, zipCode: e.target.value }))}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="country">Country</Label>
+            <Input
+              id="country"
+              placeholder="United States"
+              value={address.country || ""}
+              onChange={(e) => setAddress(prev => ({ ...prev, country: e.target.value }))}
+            />
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="isDefault"
+            checked={address.isDefault || false}
+            onChange={(e) => setAddress(prev => ({ ...prev, isDefault: e.target.checked }))}
+          />
+          <Label htmlFor="isDefault" className="text-sm">
+            Set as default address
+          </Label>
+        </div>
+      </div>
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={() => onOpenChange(false)}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave} className="bg-secondary text-white" disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save Address"}
+        </Button>
+      </div>
+    </DialogContent>
+  );
+};
+
 export default function ProfilePage() {
   const { data: session } = useSession();
-
-  const [customer, setCustomer] = useState<CustomerInterface | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [customer, setCustomer] = useState<CustomerInterface | null>(null);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null);
+
+  // Form states
+  const [personalInfo, setPersonalInfo] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    bio: "",
+    email: ""
+  });
+
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    orderUpdates: true,
+    promotionsAndDeals: false,
+    newsletter: false,
+    wishlistUpdates: true
+  });
+
+  const emptyAddress: Address = {
+    type: "Home",
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    isDefault: false
+  };
+
+  const [currentAddress, setCurrentAddress] = useState<Address>(emptyAddress);
+
   useEffect(() => {
     const fetchProfile = async () => {
       const userId = session?.user?.id;
@@ -91,6 +252,19 @@ export default function ProfilePage() {
         const profile = await fetchCustomerProfile(userId);
         if (profile) {
           setCustomer(profile);
+          setPersonalInfo({
+            firstName: profile.firstName || profile.user.name?.split(" ")[0] || "",
+            lastName: profile.lastName || profile.user.name?.split(" ")[1] || "",
+            phone: profile.phone || "",
+            bio: profile.bio || "",
+            email: profile.user.email || ""
+          });
+          setNotificationPrefs({
+            orderUpdates: profile.notificationPreferences?.orderUpdates ?? true,
+            promotionsAndDeals: profile.notificationPreferences?.promotionsAndDeals ?? false,
+            newsletter: profile.notificationPreferences?.newsletter ?? false,
+            wishlistUpdates: profile.notificationPreferences?.wishlistUpdates ?? true
+          });
         }
       }
       setLoading(false);
@@ -98,9 +272,119 @@ export default function ProfilePage() {
     fetchProfile();
   }, [session?.user?.id]);
 
+  const handleUpdateCustomer = async (updates: Partial<CustomerInterface>) => {
+    if (!session?.user.id) return;
+    try {
+      setIsSaving(true);
+      const response = await axiosInstance.put(`/customer/${session.user.id}`, updates);
+      setCustomer(response.data);
+      toast('Profile updated successfully');
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to update profile');
+      console.error("Failed to update customer:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSavePersonalInfo = async () => {
+    await handleUpdateCustomer({
+      firstName: personalInfo.firstName,
+      lastName: personalInfo.lastName,
+      phone: personalInfo.phone,
+      bio: personalInfo.bio
+    });
+  };
+
+  const handleSaveNotificationPrefs = async () => {
+    await handleUpdateCustomer({
+      notificationPreferences: notificationPrefs
+    });
+  };
+
+  const handleAddOrUpdateAddress = async (address: Address) => {
+    let updatedAddresses = [...(customer?.addresses || [])];
+    
+    if (editingAddressIndex !== null) {
+      updatedAddresses[editingAddressIndex] = address;
+    } else {
+      updatedAddresses.push(address);
+    }
+
+    // Ensure only one default address
+    if (address.isDefault) {
+      updatedAddresses = updatedAddresses.map(addr => ({
+        ...addr,
+        isDefault: addr === address
+      }));
+    }
+
+    const updatedCustomer = await handleUpdateCustomer({
+      addresses: updatedAddresses
+    });
+
+    setCustomer(updatedCustomer || customer);
+    setEditingAddressIndex(null);
+    setCurrentAddress(emptyAddress);
+  };
+
+  const handleEditAddress = (index: number) => {
+    setEditingAddressIndex(index);
+    setCurrentAddress(customer?.addresses?.[index] || emptyAddress);
+    setIsAddressModalOpen(true);
+  };
+
+  const handleDeleteAddress = async (index: number) => {
+    if (!customer?.addresses) return;
+    
+    const updatedAddresses = [...customer.addresses];
+    updatedAddresses.splice(index, 1);
+
+    try {
+      const updatedCustomer = await handleUpdateCustomer({
+        addresses: updatedAddresses
+      });
+      setCustomer(updatedCustomer || customer);
+    } catch (error) {
+      console.error("Failed to delete address:", error);
+    }
+  };
+
+  const handleSetDefaultAddress = async (index: number) => {
+    if (!customer?.addresses) return;
+    
+    const updatedAddresses = customer.addresses.map((addr, i) => ({
+      ...addr,
+      isDefault: i === index
+    }));
+
+    try {
+      const updatedCustomer = await handleUpdateCustomer({
+        addresses: updatedAddresses
+      });
+      setCustomer(updatedCustomer || customer);
+    } catch (error) {
+      console.error("Failed to set default address:", error);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
+
+  if (!customer) {
+    return (
+      <div className="p-6 pb-12 min-h-screen">
+        <h1 className="text-2xl font-semibold">Profile</h1>
+        <p className="text-sm text-gray-500 mb-6">
+          Unable to load profile data. Please try again.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 pb-12 min-h-screen">
       <h1 className="text-2xl font-semibold">Profile</h1>
@@ -126,8 +410,8 @@ export default function ProfilePage() {
           <Card className="bg-gray-50 shadow-none border-none p-0 m-0">
             <CardContent className="space-y-6 m-0 p-0">
               {/* Personal Information */}
-              <div className="p-8 bg-white rounded-md shadow-sm border">
-                <h2 className=" font-semibold mb-1 text-xl">
+              <div className="p-8 bg-white rounded-sm shadow-sm border">
+                <h2 className="font-semibold mb-1 text-xl">
                   Personal Information
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
@@ -135,72 +419,70 @@ export default function ProfilePage() {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      First name
-                    </label>
-                    <input
-                      className="border rounded-sm px-2 py-1  w-full"
+                    <Label htmlFor="firstName">First name</Label>
+                    <Input
+                      id="firstName"
+                      value={personalInfo.firstName}
+                      onChange={(e) => setPersonalInfo({...personalInfo, firstName: e.target.value})}
                       placeholder="First name"
-                      defaultValue={
-                        customer?.user.name?.split(" ")[0] || "No name provided"
-                      }
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Last name
-                    </label>
-                    <input
-                      className="border rounded-sm px-2 py-1  w-full"
+                    <Label htmlFor="lastName">Last name</Label>
+                    <Input
+                      id="lastName"
+                      value={personalInfo.lastName}
+                      onChange={(e) => setPersonalInfo({...personalInfo, lastName: e.target.value})}
                       placeholder="Last name"
-                      defaultValue={
-                        customer?.user.name?.split(" ")[1] || "No name provided"
-                      }
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Email
-                    </label>
-                    <input
-                      className="border rounded-sm px-2 py-1  w-full"
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={personalInfo.email}
+                      onChange={(e) => setPersonalInfo({...personalInfo, email: e.target.value})}
                       placeholder="Email"
-                      defaultValue={customer?.user.email || "No email provided"}
+                      disabled
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Phone
-                    </label>
-                    <input
-                      className="border rounded-sm px-2 py-1  w-full"
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      value={personalInfo.phone}
+                      onChange={(e) => setPersonalInfo({...personalInfo, phone: e.target.value})}
                       placeholder="Phone"
-                      defaultValue="+1 (555) 123-4567"
                     />
                   </div>
                 </div>
                 <div className="mt-4">
-                  <label className="block text-sm font-medium mb-1">Bio</label>
-                  <textarea
-                    className="w-full border rounded-sm px-2 py-1 "
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    value={personalInfo.bio}
+                    onChange={(e) => setPersonalInfo({...personalInfo, bio: e.target.value})}
                     rows={3}
                     placeholder="Tell us about yourself"
                   />
                 </div>
                 <div className="flex justify-between mt-6">
-                  <button className="flex items-center gap-1 border px-4 py-2 rounded-sm ">
-                    <span className="material-icons text-base">close</span>
+                  <Button variant="outline">
                     Cancel
-                  </button>
-                  <button className="bg-secondary text-white px-4 py-2 rounded-sm ">
-                    Save Changes
-                  </button>
+                  </Button>
+                  <Button 
+                    onClick={handleSavePersonalInfo}
+                    className="bg-secondary text-white"
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Saving..." : "Save Changes"}
+                  </Button>
                 </div>
               </div>
 
               {/* Notification Preferences */}
-              <div className="p-8 bg-white rounded-md shadow-sm border ">
-                <h2 className=" font-semibold mb-1 mt-8 text-xl">
+              <div className="p-8 bg-white rounded-sm shadow-sm border">
+                <h2 className="font-semibold mb-1 mt-8 text-xl">
                   Notification Preferences
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
@@ -208,38 +490,58 @@ export default function ProfilePage() {
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b pb-3">
-                    <span className="">Order Updates</span>
+                    <Label htmlFor="orderUpdates">Order Updates</Label>
                     <Switch
+                      id="orderUpdates"
                       className="data-[state=checked]:bg-secondary"
-                      defaultChecked
+                      checked={notificationPrefs.orderUpdates}
+                      onCheckedChange={(checked) => 
+                        setNotificationPrefs(prev => ({ ...prev, orderUpdates: checked }))
+                      }
                     />
                   </div>
                   <div className="flex items-center justify-between border-b pb-3">
-                    <span className="">Promotions and deals</span>
+                    <Label htmlFor="promotionsAndDeals">Promotions and deals</Label>
                     <Switch
+                      id="promotionsAndDeals"
                       className="data-[state=checked]:bg-secondary"
-                      defaultChecked={false}
+                      checked={notificationPrefs.promotionsAndDeals}
+                      onCheckedChange={(checked) => 
+                        setNotificationPrefs(prev => ({ ...prev, promotionsAndDeals: checked }))
+                      }
                     />
                   </div>
                   <div className="flex items-center justify-between border-b pb-3">
-                    <span className="">Newsletter</span>
+                    <Label htmlFor="newsletter">Newsletter</Label>
                     <Switch
+                      id="newsletter"
                       className="data-[state=checked]:bg-secondary"
-                      defaultChecked={false}
+                      checked={notificationPrefs.newsletter}
+                      onCheckedChange={(checked) => 
+                        setNotificationPrefs(prev => ({ ...prev, newsletter: checked }))
+                      }
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="">Wishlist updates</span>
+                    <Label htmlFor="wishlistUpdates">Wishlist updates</Label>
                     <Switch
+                      id="wishlistUpdates"
                       className="data-[state=checked]:bg-secondary"
-                      defaultChecked
+                      checked={notificationPrefs.wishlistUpdates}
+                      onCheckedChange={(checked) => 
+                        setNotificationPrefs(prev => ({ ...prev, wishlistUpdates: checked }))
+                      }
                     />
                   </div>
                 </div>
                 <div className="flex justify-end mt-6">
-                  <button className="bg-secondary text-white px-4 py-2 rounded-sm ">
-                    Save Preferences
-                  </button>
+                  <Button 
+                    onClick={handleSaveNotificationPrefs}
+                    className="bg-secondary text-white"
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Saving..." : "Save Preferences"}
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -250,56 +552,111 @@ export default function ProfilePage() {
         <TabsContent value="address">
           <Card>
             <CardContent className="p-4 px-8">
-              <h2 className=" font-semibold mb-1 text-xl">Addresses</h2>
-              <p className="text-sm text-gray-500 mb-4">
-                Manage your shipping and billing addresses.
-              </p>
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="font-semibold mb-1 text-xl">Addresses</h2>
+                  <p className="text-sm text-gray-500">
+                    Manage your shipping and billing addresses.
+                  </p>
+                </div>
+                <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="bg-secondary text-white"
+                      onClick={() => {
+                        setEditingAddressIndex(null);
+                        setCurrentAddress(emptyAddress);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Address
+                    </Button>
+                  </DialogTrigger>
+                  <AddressDialog
+                    open={isAddressModalOpen}
+                    onOpenChange={setIsAddressModalOpen}
+                    onSave={handleAddOrUpdateAddress}
+                    initialAddress={currentAddress}
+                  />
+                </Dialog>
+              </div>
 
               <div className="space-y-4">
-                {/* Home Address */}
-                <div className="border p-4 rounded-sm">
-                  <div className="flex items-center gap-2 mb-1">
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    <span className="font-medium ">Home</span>
+                {customer.addresses && customer.addresses.length > 0 ? (
+                  customer.addresses.map((address, index) => (
+                    <div key={index} className="border p-4 rounded-sm">
+                      <div className="flex items-center gap-2 mb-1">
+                        <MapPin className="h-4 w-4 text-gray-400" />
+                        <span className="font-medium">{address.type || "Address"}</span>
+                        {address.isDefault && (
+                          <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-sm">
+                            Default
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {[
+                          address.street,
+                          address.city,
+                          address.state,
+                          address.zipCode,
+                          address.country
+                        ].filter(Boolean).join(", ")}
+                      </p>
+                      <div className="flex gap-2 text-sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditAddress(index)}
+                        >
+                          <Edit className="w-3 h-3 mr-1" /> Edit
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteAddress(index)}
+                          className="text-red-500"
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" /> Delete
+                        </Button>
+                        <Button 
+                          variant={address.isDefault ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleSetDefaultAddress(index)}
+                          disabled={address.isDefault}
+                          className={address.isDefault ? "bg-yellow-100 text-yellow-800" : ""}
+                        >
+                          <Star className="w-3 h-3 mr-1" /> 
+                          {address.isDefault ? "Default" : "Set as Default"}
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No addresses found.</p>
+                    <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          className="mt-2 bg-secondary text-white"
+                          onClick={() => {
+                            setEditingAddressIndex(null);
+                            setCurrentAddress(emptyAddress);
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Address
+                        </Button>
+                      </DialogTrigger>
+                      <AddressDialog
+                        open={isAddressModalOpen}
+                        onOpenChange={setIsAddressModalOpen}
+                        onSave={handleAddOrUpdateAddress}
+                        initialAddress={currentAddress}
+                      />
+                    </Dialog>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    12 Rosewood Lane, Flat 3A, Manchester, M14 5TR, United
-                    Kingdom
-                  </p>
-                  <div className="flex gap-2 text-sm">
-                    <span className="flex items-center gap-1 px-2 py-1 border rounded-sm">
-                      <Edit className="w-3 h-3" /> Edit
-                    </span>
-                    <span className="flex items-center gap-1 px-2 py-1 border rounded-sm text-red-500">
-                      <Trash2 className="w-3 h-3" /> Delete
-                    </span>
-                    <span className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-sm text-yellow-500">
-                      <Star className="w-3 h-3" /> Default
-                    </span>
-                  </div>
-                </div>
-
-                {/* Work Address */}
-                <div className="border p-4 rounded-sm">
-                  <div className="flex items-center gap-2 mb-1">
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    <span className="font-medium ">Work</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Unit 7, Orion Business Park, Slough, SL1 4QT, UK
-                  </p>
-                  <div className="flex gap-2 text-sm">
-                    <span className="flex items-center gap-1 px-2 py-1 border rounded-sm">
-                      <Edit className="w-3 h-3" /> Edit
-                    </span>
-                    <span className="flex items-center gap-1 px-2 py-1 border rounded-sm text-red-500">
-                      <Trash2 className="w-3 h-3" /> Delete
-                    </span>
-                    <span className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-sm text-gray-500">
-                      <Star className="w-3 h-3" /> Set as Default
-                    </span>
-                  </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -309,7 +666,7 @@ export default function ProfilePage() {
         <TabsContent value="transactions">
           <Card>
             <CardContent className="p-4 px-8">
-              <h2 className=" font-semibold mb-1 text-xl">
+              <h2 className="font-semibold mb-1 text-xl">
                 Payment Transactions
               </h2>
               <p className="text-sm text-gray-500 mb-4">
@@ -318,39 +675,49 @@ export default function ProfilePage() {
               </p>
 
               <div className="space-y-3">
-                {["Paid", "Pending", "Failed"].map((status) => (
-                  <div
-                    key={status}
-                    className="border p-4 rounded-sm flex flex-col md:flex-row justify-between"
-                  >
-                    <div>
-                      <div className="font-medium ">Wireless Headphones</div>
-                      <div className="text-sm text-gray-500">
-                        Transaction ID: TXN-453229
+                {customer.transactions && customer.transactions.length > 0 ? (
+                  customer.transactions.map((transaction) => (
+                    <div
+                      key={transaction._id}
+                      className="border p-4 rounded-sm flex flex-col md:flex-row justify-between"
+                    >
+                      <div>
+                        <div className="font-medium">
+                          {transaction.productName || transaction.description || "Transaction"}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Transaction ID: {transaction.transactionId}
+                        </div>
+                        <div className="text-sm text-gray-500 mb-1">
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </div>
+                        <div className="font-semibold text-base">
+                          ${transaction.amount.toFixed(2)}
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-500 mb-1">
-                        May 16, 2023
+                      <div className="flex flex-col md:items-end gap-2 mt-2 md:mt-0">
+                        <span
+                          className={`px-2 py-0.5 text-sm rounded-sm w-fit ${
+                            transaction.status === "Paid"
+                              ? "bg-green-100 text-green-700"
+                              : transaction.status === "Pending"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {transaction.status}
+                        </span>
+                        <Button variant="outline" size="sm">
+                          <Download className="h-3 w-3 mr-1" /> Download Receipt
+                        </Button>
                       </div>
-                      <div className="font-semibold text-base">$249.99</div>
                     </div>
-                    <div className="flex flex-col md:items-end gap-2 mt-2 md:mt-0">
-                      <span
-                        className={`px-2 py-0.5 text-sm rounded-sm w-fit ${
-                          status === "Paid"
-                            ? "bg-green-100 text-green-700"
-                            : status === "Pending"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {status}
-                      </span>
-                      <span className="flex items-center gap-1 px-4 py-2 cursor-pointer border rounded-sm text-sm">
-                        <Download className="h-3 w-3" /> Download Receipt
-                      </span>
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No transactions found.</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
