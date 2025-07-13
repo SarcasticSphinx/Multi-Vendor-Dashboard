@@ -313,7 +313,6 @@ export default function ProfilePage() {
       updatedAddresses.push(address);
     }
 
-    // Ensure only one default address
     if (address.isDefault) {
       updatedAddresses = updatedAddresses.map(addr => ({
         ...addr,
