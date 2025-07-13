@@ -15,10 +15,11 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { signOut } from "next-auth/react";
-import { Key, LogOut, Mail, User } from "lucide-react";
+import { Key, Loader2, LogOut, Mail, User } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import Loading from "@/components/Loading";
 import { toast } from "react-toastify";
+import uploadToCloudinary from "@/lib/cloudinary";
 
 interface NotificationPreferences {
   orderUpdates: boolean;
@@ -44,11 +45,12 @@ interface CustomerInterface {
 }
 
 const Settings = () => {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const [customerData, setCustomerData] = useState<CustomerInterface | null>(
     null
   );
   const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -87,6 +89,33 @@ const Settings = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPasswordData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!session?.user.id) return;
+
+    const file = e.target.files?.[0];
+    setIsUpdating(true);
+    if (file) {
+      const url = await uploadToCloudinary(file);
+      console.log(url);
+      if (url) {
+        const updatedUser = await axiosInstance.put(
+          `/auth/update-profile-picture/${session?.user.id}`,
+          { image: url }
+        );
+        if (updatedUser.status === 200) {
+          toast("Profile photo updated successfully.");
+        }
+        await update({
+          user: {
+            ...session?.user,
+            image: url,
+          },
+        });
+        setIsUpdating(false);
+      }
+    }
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
@@ -147,13 +176,28 @@ const Settings = () => {
         <CardContent>
           <div className="flex flex-col md:flex-row gap-6 items-start">
             <div className="flex flex-col items-center gap-4">
-              <Avatar className="w-24 h-24">
-                <AvatarImage src={session?.user?.image || undefined} />
+              <Avatar className="w-24 h-24 flex justify-center items-center">
+                {isUpdating ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <AvatarImage src={session?.user?.image || undefined} />
+                )}
                 <AvatarFallback className="text-3xl">
                   {session?.user?.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
-              <Button variant="outline">Change Photo</Button>
+              <Label htmlFor="avatar-upload">
+                <Button variant="outline" asChild>
+                  <span>{isUpdating? 'Updating Photo': 'Change Photo' }</span>
+                </Button>
+              </Label>
+              <Input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
             </div>
 
             <div className="flex-1 space-y-4">

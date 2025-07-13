@@ -27,8 +27,7 @@ const authOptions: NextAuthOptions = {
         if (!user) throw new Error("No user found");
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) throw new Error("Invalid credentials");
-
-        return user;
+        return user.toObject();
       },
     }),
   ],
@@ -38,14 +37,21 @@ const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       await connectToMongoDB();
 
-      if (account?.provider === "google") {
+      if (user) {
+        token.id = user.id?.toString();
+        token.role = user.role;
+        token.email = user.email;
+        token.name = user.name;
+        token.image = user.image || "";
+      }
+
+      if (account?.provider === "google" && !user) {
         const existingUser = await User.findOne({ email: token.email });
 
         if (!existingUser) {
-
           const newUser = await User.create({
             name: token.name,
             email: token.email,
@@ -53,32 +59,38 @@ const authOptions: NextAuthOptions = {
             role: "customer",
           });
 
-          // if the new user is a customer, create a customer profile and if fails then delete the user
           if (newUser.role === "customer") {
             try {
               await Customer.create({
                 user: newUser._id,
-                firstName: newUser.name.split(" ")[0],
-                lastName: newUser.name.split(" ")[1] || "",
+                firstName: newUser.name?.split(" ")[0] || "",
+                lastName: newUser.name?.split(" ")[1] || "",
               });
             } catch (error) {
-              console.log('Failed to create customer profile after user creation.', error);
+              console.error("Error creating customer profile:", error);
               await User.findByIdAndDelete(newUser._id);
+              return {};
             }
           }
-
-
           token.role = newUser.role;
           token.id = newUser._id.toString();
+          token.image = newUser.image;
+          token.email = newUser.email;
+          token.name = newUser.name;
         } else {
           token.role = existingUser.role;
           token.id = existingUser._id.toString();
+          token.image = existingUser.image;
+          token.email = existingUser.email;
+          token.name = existingUser.name;
         }
       }
 
-      if (user) {
-        token.role = user.role;
-        token.id = user.id?.toString();
+      if (trigger === "update" && session?.user?.image !== undefined) {
+        token.image = session.user.image;
+      }
+      if (trigger === "update" && session?.user?.name !== undefined) {
+        token.name = session.user.name;
       }
 
       return token;
@@ -86,8 +98,11 @@ const authOptions: NextAuthOptions = {
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role;
-        session.user.id = token.id;
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.image = token.image as string;
       }
       return session;
     },
