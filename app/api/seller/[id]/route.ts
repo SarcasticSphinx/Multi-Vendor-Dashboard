@@ -10,7 +10,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
 
   try {
     await connectToMongoDB();
-    const seller = await Seller.findOne({ user: id }).populate("user");
+    const seller = await Seller.findOne({ user: id }).populate("user").populate('products').populate('orders');
 
     return NextResponse.json(seller);
   } catch (error) {
