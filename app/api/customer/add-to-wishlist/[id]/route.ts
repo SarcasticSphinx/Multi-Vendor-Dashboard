@@ -2,45 +2,42 @@ import { connectToMongoDB } from "@/lib/mongoose";
 import Customer from "@/models/Customer.model";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import Seller from '@/models/Seller.model';
+import Product from "@/models/Product.model";
 type Params = Promise<{ id: string }>;
 
-export async function PATCH(
-  req: NextRequest,
-  context: { params: Params }
-) {
+export async function GET(req: NextRequest, context: { params: Params }) {
   try {
     await connectToMongoDB();
     const params = await context.params;
     const { id } = params;
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("productId");
 
-    if (!productId) {
-      return NextResponse.json(
-        { error: "Missing productId in query" },
-        { status: 400 }
-      );
-    }
+    //dummy request to register the seller model and product model
+    await Seller.findOne({ user: id })
+    await Product.findOne({ sellerId: id });
 
-    const updatedCustomer = await Customer.findOneAndUpdate(
-      { user: new mongoose.Types.ObjectId(id) },
-      { $push: { wishlist: new mongoose.Types.ObjectId(productId) } },
-      { new: true }
-    );
+    // console.log(id, "User ID from params");
+    const customer = await Customer.findOne({
+      user: new mongoose.Types.ObjectId(id),
+    }).populate({
+      path: "wishlist", 
+      model: "Product", 
+      populate: {
+        path: "sellerId",
+        model: "Seller",
+      },
+    });
 
-    if (!updatedCustomer) {
-      return NextResponse.json(
-        { error: "customer not found" },
-        { status: 404 }
-      );
-    }
+    // console.log(customer, "Customer fetched by user ID");
 
-    return NextResponse.json(updatedCustomer);
+    return NextResponse.json({ customerId: customer._id, wishlist: customer.wishlist });
   } catch (error) {
+    console.error("Fetch Customer Error:", error);
     const message =
       error instanceof Error ? error.message : "Unknown server error";
+
     return NextResponse.json(
-      { error: "Failed to update customer", details: message },
+      { message: "Failed to fetch customer by user id", error: message },
       { status: 500 }
     );
   }
