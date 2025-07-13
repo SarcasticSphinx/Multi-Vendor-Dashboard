@@ -93,8 +93,8 @@ const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
   async function handleAddToWishlist() {
     if (!product) return;
     try {
-      await axiosInstance.patch(
-        `/customer/add-to-wishlist/${session?.user.id}?productId=${product._id}&quantity=${quantity}`
+      await axiosInstance.post(
+        `/customer/wishlist/update-customer-wishlist/${session?.user.id}?productId=${product._id}`
       );
       toast.success("Product added to wishlist successfully!");
     } catch (error) {

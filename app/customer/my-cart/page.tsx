@@ -126,7 +126,7 @@ const MyCart = () => {
       const response = await axiosInstance.delete(
         `/customer/cart/update-customer-cart/${session?.user.id}?productId=${itemId}`
       );
-      setCustomerCart(response.data.cartProducts);
+      setCustomerCart(response.data.products);
       setSelectedItems((prev) => prev.filter((item) => item.productId !== itemId));
     } catch (error) {
       console.error("Error removing cart item:", error);

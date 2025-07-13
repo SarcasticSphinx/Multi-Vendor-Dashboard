@@ -26,14 +26,13 @@ export async function POST(req: NextRequest, context: { params: Params }) {
     const updatedCustomer = await Customer.findOneAndUpdate(
       { user: new mongoose.Types.ObjectId(id) },
       {
-        $push: {
-          wishlist: {
-            productId: new mongoose.Types.ObjectId(productId),
-          },
+        $addToSet: { // Use $addToSet to prevent duplicate product IDs in the wishlist
+          wishlist: new mongoose.Types.ObjectId(productId), // Pushing only the ObjectId
         },
       },
       { new: true }
     );
+
 
     // console.log(updatedCustomer, "updatedCustomer");
 
@@ -90,9 +89,7 @@ export async function DELETE(req: NextRequest, context: { params: Params }) {
       { user: new mongoose.Types.ObjectId(id) },
       {
         $pull: {
-          wishlist: {
-            productId: new mongoose.Types.ObjectId(productId),
-          },
+          wishlist: new mongoose.Types.ObjectId(productId), 
         },
       },
       { new: true }

@@ -232,7 +232,7 @@ export async function DELETE(req: NextRequest, context: { params: Params }) {
 
     if (returnUpdatedProducts) {
       return NextResponse.json(
-        { products: updatedCustomer.cartProducts },
+        { products: updatedCustomer.cartProducts || [] },
         { status: 200 }
       );
     } else {
