@@ -2,7 +2,6 @@ import { connectToMongoDB } from "@/lib/mongoose";
 import Customer from "@/models/Customer.model";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
-import Product from "@/models/Product.model";
 import Order from "@/models/Order.model";
 type Params = Promise<{ id: string }>;
 
@@ -14,17 +13,16 @@ export async function GET(req: NextRequest, context: { params: Params }) {
 
     //dummy request to register the seller model and product model
     await Order.findOne({ user: id });
-    await Product.findById(id);
 
     // console.log(id, "User ID from params");
     const customer = await Customer.findOne({
       user: new mongoose.Types.ObjectId(id),
     }).populate({
-      path: "orders.product",
-      model: "Product",
-    });
+      path: "orders",
+      model: "Order",
+    })
 
-    // console.log(customer, "Customer fetched by user ID");
+    // console.log(customer.orders, "Customer orders fetched by user ID");
 
     return NextResponse.json({
       orders: customer.orders,

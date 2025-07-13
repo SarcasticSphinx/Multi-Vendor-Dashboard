@@ -97,6 +97,7 @@ export interface Shipping {
 
 export interface Order {
   _id?: string;
+  orderId?: string;
   customer: string;
   orderItems: OrderItem[];
   orderStatus?:
@@ -195,6 +196,9 @@ const CheckOutPage: React.FC = () => {
   const [customer, setCustomer] = useState<CustomerInterface | null>(null);
   const [formData, setFormData] = useState<Order>({
     customer: customerId || "",
+    orderId: session?.user?.id
+      ? `ORD-${session.user.id.slice(-5)}`
+      : "",
     orderItems: [],
     orderStatus: "pending",
     shippingAddress: {
