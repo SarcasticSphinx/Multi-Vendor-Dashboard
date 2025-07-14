@@ -50,6 +50,9 @@ const EditProductPage = ({ params }: PageProps) => {
   if (!session) {
     redirect("/login");
   }
+  if (session.user.role !== "seller") {
+      redirect("/unauthorized");
+    }
   const { id } = use(params);
   const router = useRouter();
   const [product, setProduct] = useState<Product>({});

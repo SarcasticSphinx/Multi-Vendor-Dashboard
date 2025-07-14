@@ -37,6 +37,9 @@ const AddProductPage: React.FC = () => {
   if (!session) {
     redirect("/login");
   }
+  if (session.user.role !== "seller") {
+      redirect("/unauthorized");
+    }
 
   useEffect(() => {
     const fetchSellerId = async () => {

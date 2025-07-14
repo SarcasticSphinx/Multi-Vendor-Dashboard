@@ -70,6 +70,9 @@ const OrderDetailsPage = ({ params }: PageProps) => {
   if (!session) {
     redirect("/login");
   }
+  if (session.user.role !== "seller") {
+      redirect("/unauthorized");
+    }
   const par = use(params);
   const { id } = par;
   const router = useRouter()

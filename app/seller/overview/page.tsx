@@ -44,6 +44,10 @@ const OverviewPage: React.FC = () => {
   if (!session) {
     redirect("/login");
   }
+
+  if (session.user.role !== "seller") {
+    redirect("/unauthorized");
+  }
   const [loading, setLoading] = useState(true);
   const [sellerData, setSellerData] = useState<SellerData | null>(null);
 

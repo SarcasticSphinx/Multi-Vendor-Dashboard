@@ -10,6 +10,9 @@ const PaymentPage = () => {
   if (!session) {
     redirect("/login");
   }
+  if (session.user.role !== "seller") {
+      redirect("/unauthorized");
+    }
   return (
     <div className="mx-auto p-6">
       <div className="mb-6">

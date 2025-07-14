@@ -52,6 +52,9 @@ const SellerOrdersPage = () => {
   if (!session) {
     redirect("/login");
   }
+  if (session.user.role !== "seller") {
+      redirect("/unauthorized");
+    }
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

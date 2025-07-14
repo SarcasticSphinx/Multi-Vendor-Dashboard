@@ -26,6 +26,9 @@ const ProductsPage = () => {
   if (!session) {
     redirect("/login");
   }
+  if (session.user.role !== "seller") {
+      redirect("/unauthorized");
+    }
   const [sellerId, setSellerId] = useState<string>("");
 
   useEffect(()=> {
