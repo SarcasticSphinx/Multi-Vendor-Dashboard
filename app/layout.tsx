@@ -31,7 +31,7 @@ export default function RootLayout({
           <Navbar />
           <SearchBox />
           <Sidebar />
-          <div className="sm:pl-90 sm:mt-36 sm:pr-20">{children}</div>
+          <div className="pl-18 mt-34 pr-4 sm:pl-90 sm:mt-36 sm:pr-20">{children}</div>
           <ToastContainer
             position="top-right"
             autoClose={3000}
