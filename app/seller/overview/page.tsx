@@ -5,10 +5,6 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import {
-  FiBox,
-  FiTruck,
-  FiCheckCircle,
-  FiXCircle,
   FiTrendingUp,
   FiAlertCircle,
 } from "react-icons/fi";

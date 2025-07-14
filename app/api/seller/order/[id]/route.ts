@@ -8,9 +8,10 @@ import Seller from "@/models/Seller.model"; // Make sure Seller model is correct
 type Params = { id: string };
 
 export async function GET(req: NextRequest, context: { params: Params }) {
+    const params = await context.params;
+  const id = params.id;
   try {
     await connectToMongoDB();
-    const { id } = context.params; // Destructure id directly from context.params
 
     console.log(id, "User ID from params");
 

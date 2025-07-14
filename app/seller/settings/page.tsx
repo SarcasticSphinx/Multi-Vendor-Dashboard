@@ -269,19 +269,19 @@ const SettingsPage = () => {
                 <Label htmlFor="contactInfo.socialMedia.website">Website</Label>
                 <Input
                   id="contactInfo.socialMedia.website"
-                  name="contactInfo.socialMedia.website"
-                  value={sellerData.contactInfo.socialMedia.website || ""}
+                  name="contactInfo.socialMedia?.website"
+                  value={sellerData.contactInfo.socialMedia?.website || ""}
                   onChange={handleInputChange}
                 />
               </div>
               <div>
-                <Label htmlFor="contactInfo.socialMedia.facebook">
+                <Label htmlFor="contactInfo.socialMedia?.facebook">
                   Facebook
                 </Label>
                 <Input
                   id="contactInfo.socialMedia.facebook"
                   name="contactInfo.socialMedia.facebook"
-                  value={sellerData.contactInfo.socialMedia.facebook || ""}
+                  value={sellerData.contactInfo.socialMedia?.facebook || ""}
                   onChange={handleInputChange}
                 />
               </div>
@@ -292,7 +292,7 @@ const SettingsPage = () => {
                 <Input
                   id="contactInfo.socialMedia.instagram"
                   name="contactInfo.socialMedia.instagram"
-                  value={sellerData.contactInfo.socialMedia.instagram || ""}
+                  value={sellerData.contactInfo.socialMedia?.instagram || ""}
                   onChange={handleInputChange}
                 />
               </div>
@@ -301,7 +301,7 @@ const SettingsPage = () => {
                 <Input
                   id="contactInfo.socialMedia.twitter"
                   name="contactInfo.socialMedia.twitter"
-                  value={sellerData.contactInfo.socialMedia.twitter || ""}
+                  value={sellerData.contactInfo.socialMedia?.twitter || ""}
                   onChange={handleInputChange}
                 />
               </div>
