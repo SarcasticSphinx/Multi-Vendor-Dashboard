@@ -1,5 +1,7 @@
 import { connectToMongoDB } from "@/lib/mongoose";
+import Customer from "@/models/Customer.model";
 import Order from "@/models/Order.model";
+import Product from "@/models/Product.model";
 import { NextRequest, NextResponse } from "next/server";
 
 type Params = Promise<{ id: string }>;
@@ -11,7 +13,12 @@ export async function GET(req: NextRequest, context: { params: Params }) {
   try {
     await connectToMongoDB();
 
-    const order = await Order.findById(id);
+    await Customer.db.asPromise();
+    await Product.db.asPromise();
+
+    const order = await Order.findById(id)
+      .populate("orderItems.product")
+      .populate("customer");
 
     return NextResponse.json(order);
   } catch (error) {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { Eye, Search, Truck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -15,13 +15,35 @@ import {
 import Loading from "@/components/Loading";
 import axiosInstance from "@/lib/axios";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";;
+import { DialogHeader } from "@/components/ui/dialog";
 
 interface Order {
+  _id: string;
   orderId: string;
-  date: string;
-  buyer: string;
-  amount: number;
-  status: "Pending" | "Shipped" | "Delivered" | "Cancelled";
+  orderDate: string;
+  customer: {
+    _id: string;
+    firstName: string;
+    lastName?: string;
+  };
+  orderItems: {
+    product: {
+      productTitle: string;
+    };
+    quantity: number;
+  }[];
+  pricing: {
+    subtotal: number;
+    total: number;
+  };
+  orderStatus: string;
 }
 
 const SellerOrdersPage = () => {
@@ -50,28 +72,39 @@ const SellerOrdersPage = () => {
     fetchOrders();
   }, [session?.user.id]);
 
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.buyer.toLowerCase().includes(searchTerm.toLowerCase());
+      order.customer.firstName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
-      statusFilter === "All" || order.status === statusFilter;
+      statusFilter === "All" || order.orderStatus === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case "Pending":
+      case "pending":
         return "bg-yellow-100 text-yellow-800";
-      case "Shipped":
+      case "shipped":
         return "bg-blue-100 text-blue-800";
-      case "Delivered":
+      case "delivered":
         return "bg-green-100 text-green-800";
-      case "Cancelled":
+      case "cancelled":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   if (loading) return <Loading />;
@@ -103,13 +136,13 @@ const SellerOrdersPage = () => {
           <TabsTrigger className="py-2" value="All">
             All
           </TabsTrigger>
-          <TabsTrigger className="py-2" value="Pending">
+          <TabsTrigger className="py-2" value="pending">
             Pending
           </TabsTrigger>
-          <TabsTrigger className="py-2" value="Shipped">
+          <TabsTrigger className="py-2" value="shipped">
             Shipped
           </TabsTrigger>
-          <TabsTrigger className="py-2" value="Cancelled">
+          <TabsTrigger className="py-2" value="cancelled">
             Cancelled
           </TabsTrigger>
         </TabsList>
@@ -133,28 +166,99 @@ const SellerOrdersPage = () => {
               filteredOrders.map((order) => (
                 <TableRow key={order.orderId}>
                   <TableCell className="font-medium">{order.orderId}</TableCell>
-                  <TableCell>{order.date}</TableCell>
-                  <TableCell>{order.buyer}</TableCell>
-                  <TableCell>${order.amount}</TableCell>
+                  <TableCell>{formatDate(order.orderDate)}</TableCell>
+                  <TableCell>
+                    {order.customer.firstName + " " + order.customer.lastName}
+                  </TableCell>
+                  <TableCell>${order.pricing.total}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(
-                        order.status
+                        order.orderStatus
                       )}`}
                     >
-                      {order.status}
+                      {order.orderStatus}
                     </span>
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="ghost" size="sm">
-                        View
-                      </Button>
-                      {order.status === "Pending" && (
-                        <Button variant="ghost" size="sm">
-                          Ship
-                        </Button>
+                      {order.orderStatus === "pending" && (
+                        <>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setSelectedOrder(order)}
+                          >
+                            <Truck />
+                            Ship
+                          </Button>
+                          {selectedOrder?.orderId === order.orderId && (
+                            <Dialog
+                              open={true}
+                              onOpenChange={() => setSelectedOrder(null)}                            >
+                              <DialogContent className="w-sm">
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Order #{order.orderId}
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Placed on {formatDate(order.orderDate)}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-2 mt-4">
+                                  <div className="flex justify-between border-b-2 pb-2">
+                                    <span>Status:</span>
+                                    <span className="text-yellow-600 font-medium">
+                                      {order.orderStatus}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Products:</span>
+                                    <div className="flex flex-col justify-end items-end">
+                                      {order.orderItems.map((item) => (
+                                      <span key={item.product.productTitle}>
+                                        {item.product.productTitle} (x{item.quantity})
+                                      </span>
+                                    ))}
+                                    </div>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Amount:</span>
+                                    <span>${order.pricing.total}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Customer:</span>
+                                    <span>
+                                      {order.customer.firstName}{" "}
+                                      {order.customer.lastName}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex mt-6 w-full">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setSelectedOrder(null)}
+                                    className="flex-1 mr-2"
+                                  >
+                                    <X />
+                                    Cancel
+                                  </Button>
+                                  <Button variant="secondary" className="flex-1 ml-2">
+                                    <Truck />
+                                    Ship Order
+                                  </Button>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          )}
+                        </>
                       )}
+                      <Link href={`/seller/orders/${order._id}`}>
+                        <Button variant="outline" size="sm">
+                          <Eye />
+                          View
+                        </Button>
+                      </Link>
                     </div>
                   </TableCell>
                 </TableRow>

@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import Order from "@/models/Order.model"; // Make sure Order model is correctly imported and defined
 import Seller from "@/models/Seller.model"; // Make sure Seller model is correctly imported and defined
+import Product from "@/models/Product.model";
 
 // Define the type for context.params
 type Params = { id: string };
@@ -19,7 +20,8 @@ export async function GET(req: NextRequest, context: { params: Params }) {
     // If your models are consistently registered (e.g., via a global mongoose.model call), this might not be strictly necessary.
     // However, it doesn't hurt and ensures models are loaded.
     await Order.db.asPromise(); // Ensures models are registered and available
-    await Seller.db.asPromise(); // Same for Seller
+    await Seller.db.asPromise(); 
+    await Product.db.asPromise();
 
     // Validate ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -36,10 +38,16 @@ export async function GET(req: NextRequest, context: { params: Params }) {
       .populate({
         path: "orders",
         model: "Order",
-        populate: {
-          path: "customer",
-          model: "Customer",
-        },
+        populate: [
+          {
+            path: "customer",
+            model: "Customer",
+          },
+          {
+            path: "orderItems.product",
+            model: "Product",
+          }
+        ]
       });
 
     if (!seller) {
