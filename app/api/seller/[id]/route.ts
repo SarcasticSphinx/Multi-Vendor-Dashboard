@@ -1,4 +1,5 @@
 import { connectToMongoDB } from "@/lib/mongoose";
+import Order from "@/models/Order.model";
 import Seller from "@/models/Seller.model";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
@@ -18,9 +19,12 @@ export async function GET(req: NextRequest, context: { params: Params }) {
       );
     }
 
+    //dummy statement to register order model
+    await Order.findOne({});
+
     const seller = await Seller.findOne({
       user: new mongoose.Types.ObjectId(id),
-    }).populate("user");
+    }).populate("user").populate('orders')
 
     if (!seller) {
       return NextResponse.json({ error: "Seller not found" }, { status: 404 });
