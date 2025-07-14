@@ -7,7 +7,7 @@ import Sidebar from "@/components/Sidebar";
 import { ToastContainer } from "react-toastify";
 import AuthProvider from "../lib/AuthProvider";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -36,7 +36,9 @@ export default async function RootLayout({
           <Sidebar />
           <div
             className={`${
-              session ? "pl-18 mt-34 pr-4 sm:pl-90 sm:mt-36 sm:pr-20" : "min-h-screen mt-20 flex items-center justify-center px-4 sm:px-30"
+              session
+                ? "pl-18 mt-34 pr-4 sm:pl-90 sm:mt-36 sm:pr-20"
+                : "min-h-screen mt-20 flex items-center justify-center px-4 sm:px-30"
             } `}
           >
             {children}
