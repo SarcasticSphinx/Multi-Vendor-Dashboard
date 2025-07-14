@@ -1,88 +1,70 @@
 import { connectToMongoDB } from "@/lib/mongoose";
 import Seller from "@/models/Seller.model";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 type Params = Promise<{ id: string }>;
 
 export async function GET(req: NextRequest, context: { params: Params }) {
-  const params = await context.params
+  const params = await context.params;
   const id = params.id;
-
   try {
     await connectToMongoDB();
-    const seller = await Seller.findOne({ user: id }).populate("user").populate('products').populate('orders');
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: "Invalid seller ID format" },
+        { status: 400 }
+      );
+    }
+
+    const seller = await Seller.findOne({
+      user: new mongoose.Types.ObjectId(id),
+    }).populate("user");
+
+    if (!seller) {
+      return NextResponse.json({ error: "Seller not found" }, { status: 404 });
+    }
 
     return NextResponse.json(seller);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown server error";
+    console.error("Error fetching seller:", error);
     return NextResponse.json(
-      { error: `Failed to fetch the Seller of id: ${id}`, details: message },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
 
-export async function PATCH(
-  req: NextRequest,
-  context: {params: Params}
-) {
+export async function PATCH(req: NextRequest, context: { params: Params }) {
+  const params = await context.params;
+  const id = params.id;
   try {
     await connectToMongoDB();
-    const params = await context.params;
-    const { id } = params;
-    const updates = await req.json();
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: "Invalid seller ID format" },
+        { status: 400 }
+      );
+    }
+
+    const updates = await req.json();
     const updatedSeller = await Seller.findOneAndUpdate(
-      { user: id },
+      { user: new mongoose.Types.ObjectId(id) },
       updates,
-      {
-        new: true,
-      }
+      { new: true }
     );
 
     if (!updatedSeller) {
-      return NextResponse.json(
-        { error: "Seller not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Seller not found" }, { status: 404 });
     }
 
     return NextResponse.json(updatedSeller);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown server error";
+    console.error("Error updating seller:", error);
     return NextResponse.json(
-      { error: "Failed to update Seller", details: message },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  req: NextRequest,
-  context: { params: Params }
-) {
-  try {
-    await connectToMongoDB();
-    const params = await context.params;
-
-    const { id } = params;
-    const deletedSeller = await Seller.findOneAndDelete({ user: id });
-
-    if (!deletedSeller) {
-      return NextResponse.json(
-        { error: "Seller not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ message: "Seller deleted successfully" });
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown server error";
-    return NextResponse.json(
-      { error: "Failed to delete Seller", details: message },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
