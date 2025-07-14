@@ -5,6 +5,7 @@ import { Globe, Bell, HelpCircle } from "lucide-react";
 import { FaChevronDown } from "react-icons/fa";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const Navbar: React.FC = () => {
   const { data: session } = useSession();
@@ -13,7 +14,7 @@ const Navbar: React.FC = () => {
     <nav className="w-full border-b border-gray-200 bg-white lg:px-20 fixed top-0 left-0 z-50 shadow-sm">
       <div className="flex items-center justify-between px-4 sm:px-8 py-4">
         {/* Logo */}
-        <div className="font-bold text-xl sm:text-2xl text-secondary">Logo</div>
+        <div className="font-bold text-xl sm:text-2xl text-secondary cursor-pointer" onClick={() => redirect('/')}>Logo</div>
 
         {/* Right section */}
         <div className="flex items-center gap-2 sm:gap-6">

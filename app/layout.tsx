@@ -30,7 +30,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <AuthProvider>
+        <AuthProvider session={session}>
           <Navbar />
           <SearchBox />
           <Sidebar />
