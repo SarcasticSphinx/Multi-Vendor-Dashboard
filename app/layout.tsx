@@ -6,6 +6,8 @@ import SearchBox from "@/components/SearchBox";
 import Sidebar from "@/components/Sidebar";
 import { ToastContainer } from "react-toastify";
 import AuthProvider from "../lib/AuthProvider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -19,11 +21,12 @@ export const metadata: Metadata = {
     "This is a multi-vendor e-commerce platform built with Next.js and TypeScript.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
@@ -31,7 +34,13 @@ export default function RootLayout({
           <Navbar />
           <SearchBox />
           <Sidebar />
-          <div className="pl-18 mt-34 pr-4 sm:pl-90 sm:mt-36 sm:pr-20">{children}</div>
+          <div
+            className={`${
+              session ? "pl-18 mt-34 pr-4 sm:pl-90 sm:mt-36 sm:pr-20" : "min-h-screen mt-20 flex items-center justify-center px-4 sm:px-30"
+            } `}
+          >
+            {children}
+          </div>
           <ToastContainer
             position="top-right"
             autoClose={3000}

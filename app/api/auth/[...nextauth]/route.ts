@@ -7,7 +7,7 @@ import User from "@/models/User.model";
 import Customer from "@/models/Customer.model";
 import Seller from "@/models/Seller.model";
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,

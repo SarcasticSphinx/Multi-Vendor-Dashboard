@@ -8,6 +8,7 @@ import Link from "next/link";
 
 const SearchBox = () => {
   const { data: session } = useSession();
+  if (!session) return null;
   
   return (
     <form className="flex items-center p-4 lg:px-20 shadow-sm bg-white fixed top-18 left-0 z-50 w-full mx-auto border border-gray-200">
