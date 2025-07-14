@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToMongoDB } from "@/lib/mongoose";
 import User from "@/models/User.model";
 import Customer from "@/models/Customer.model";
+import Seller from "@/models/Seller.model";
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -41,7 +42,7 @@ const authOptions: NextAuthOptions = {
       await connectToMongoDB();
 
       if (user) {
-        token.id = user.id?.toString();
+        token.id = user._id?.toString();
         token.role = user.role;
         token.email = user.email;
         token.name = user.name;
@@ -72,6 +73,30 @@ const authOptions: NextAuthOptions = {
               return {};
             }
           }
+          if (newUser.role === "seller") {
+            try {
+                await Seller.create({
+                user: newUser._id,
+                storeName: `${newUser.name?.split(" ")[0] || ""}'s Shop`,
+                contactInfo: {
+                  email: newUser.email,
+                  phone: "N/A",
+                },
+                businessAddress: {
+                  street: "N/A",
+                  city: "N/A",
+                  state: "N/A",
+                  zipCode: "N/A",
+                  country: "N/A",
+                },
+                });
+            } catch (error) {
+              console.error("Error creating seller profile:", error);
+              await Seller.findByIdAndDelete(newUser._id);
+              return {};
+            }
+          }
+
           token.role = newUser.role;
           token.id = newUser._id.toString();
           token.image = newUser.image;

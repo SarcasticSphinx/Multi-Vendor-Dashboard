@@ -73,7 +73,8 @@ const ProductsPage = () => {
         return;
       }
       const response = await axiosInstance.get(`/products?sellerId=${sellerId}`);
-      setProducts(response.data);
+      setProducts(response.data.products || []);
+      console.log("Fetched products:", response.data);
     } catch (error) {
       console.error("Error fetching products in client side:", error);
     } finally {
