@@ -167,7 +167,15 @@ const Settings = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">Settings</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <Button
+          variant={"secondary"}
+          onClick={() => redirect("/customer/become-a-seller")}
+        >
+          Become A Seller
+        </Button>
+      </div>
 
       {/* Profile Section */}
       <Card className="mb-8">
@@ -192,7 +200,7 @@ const Settings = () => {
               </Avatar>
               <Label htmlFor="avatar-upload">
                 <Button variant="outline" asChild>
-                  <span>{isUpdating? 'Updating Photo': 'Change Photo' }</span>
+                  <span>{isUpdating ? "Updating Photo" : "Change Photo"}</span>
                 </Button>
               </Label>
               <Input
