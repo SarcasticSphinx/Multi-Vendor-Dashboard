@@ -20,6 +20,7 @@ import axiosInstance from "@/lib/axios";
 import Loading from "@/components/Loading";
 import { toast } from "react-toastify";
 import uploadToCloudinary from "@/lib/cloudinary";
+import { redirect } from "next/navigation";
 
 interface NotificationPreferences {
   orderUpdates: boolean;
@@ -46,6 +47,9 @@ interface CustomerInterface {
 
 const Settings = () => {
   const { data: session, update } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [customerData, setCustomerData] = useState<CustomerInterface | null>(
     null
   );

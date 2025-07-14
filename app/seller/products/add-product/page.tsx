@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Upload, Plus, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import uploadToCloudinary from "@/lib/cloudinary";
 import Image from "next/image";
 import axiosInstance from "@/lib/axios";
@@ -34,6 +34,9 @@ interface ProductForm {
 const AddProductPage: React.FC = () => {
   const router = useRouter();
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
 
   useEffect(() => {
     const fetchSellerId = async () => {

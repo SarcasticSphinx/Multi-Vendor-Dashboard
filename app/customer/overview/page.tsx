@@ -13,6 +13,7 @@ import {
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/lib/axios";
 import Loading from "@/components/Loading";
+import { redirect } from "next/navigation";
 
 interface StatCard {
   label: string;
@@ -55,6 +56,9 @@ interface CustomerInterface {
 
 const OverviewPage: React.FC = () => {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [customerData, setCustomerData] = useState<CustomerInterface | null>(
     null
   );

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
+import { redirect } from "next/navigation";
 
 interface Product {
   _id: string;
@@ -51,6 +52,9 @@ interface Product {
 
 const ProductDetailPage = (props: { params: Promise<{ id: string }> }) => {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   // console.log(session, "session");
   const { id } = use(props.params);
   const [product, setProduct] = useState<Product | null>(null);

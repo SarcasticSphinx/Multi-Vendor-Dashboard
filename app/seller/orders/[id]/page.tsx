@@ -5,11 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MoveLeft, Phone, Printer, Truck, X, Mail, MapPin, AlertTriangle } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { DialogHeader } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "next-auth/react";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -65,6 +66,10 @@ interface OrderDetails {
 }
 
 const OrderDetailsPage = ({ params }: PageProps) => {
+  const {data: session} = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const par = use(params);
   const { id } = par;
   const router = useRouter()

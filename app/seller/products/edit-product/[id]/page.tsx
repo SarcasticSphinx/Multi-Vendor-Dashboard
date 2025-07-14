@@ -9,11 +9,12 @@ import {
   Trash2,
   ImagePlus,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
 import Product from "../../../../../models/Product.model";
 import Image from "next/image";
 import uploadToCloudinary from "@/lib/cloudinary";
+import { useSession } from "next-auth/react";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -45,6 +46,10 @@ interface Product {
 }
 
 const EditProductPage = ({ params }: PageProps) => {
+  const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const { id } = use(params);
   const router = useRouter();
   const [product, setProduct] = useState<Product>({});

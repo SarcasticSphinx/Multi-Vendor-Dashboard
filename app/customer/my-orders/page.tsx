@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import Loading from "@/components/Loading";
 import axiosInstance from "@/lib/axios";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { redirect } from "next/navigation";
 
 interface Pricing {
   total: number;
@@ -48,6 +49,9 @@ interface Order {
 
 const MyOrdersPage: React.FC = () => {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [customerOrders, setCustomerOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");

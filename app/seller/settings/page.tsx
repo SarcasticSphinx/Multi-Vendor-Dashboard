@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axiosInstance from "@/lib/axios";
 import Loading from "@/components/Loading";
 import { toast } from "react-toastify";
+import { redirect } from "next/navigation";
 
 interface SellerData {
   storeName: string;
@@ -64,6 +65,9 @@ interface SellerData {
 
 const SettingsPage = () => {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [loading, setLoading] = useState(true);
   const [sellerData, setSellerData] = useState<SellerData | null>(null);
   const [isSaving, setIsSaving] = useState(false);

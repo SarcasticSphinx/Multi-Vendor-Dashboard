@@ -3,11 +3,9 @@ import Loading from "@/components/Loading";
 import axiosInstance from "@/lib/axios";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import {
-  FiTrendingUp,
-  FiAlertCircle,
-} from "react-icons/fi";
+import { FiTrendingUp, FiAlertCircle } from "react-icons/fi";
 import { toast } from "react-toastify";
 
 interface Order {
@@ -43,6 +41,9 @@ const getOrderStatusCount = (orders: Order[], status: string) =>
 
 const OverviewPage: React.FC = () => {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [loading, setLoading] = useState(true);
   const [sellerData, setSellerData] = useState<SellerData | null>(null);
 
@@ -88,7 +89,10 @@ const OverviewPage: React.FC = () => {
         </h1>
         <p className="mt-1 text-gray-700">
           You&apos;ve made{" "}
-          <span className="font-semibold">${todayRevenue.toLocaleString()}</span> today.
+          <span className="font-semibold">
+            ${todayRevenue.toLocaleString()}
+          </span>{" "}
+          today.
         </p>
       </div>
 
@@ -96,7 +100,9 @@ const OverviewPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <div className="bg-white rounded-lg p-4 shadow">
           <div className="text-gray-500 text-sm">Sales Today</div>
-          <div className="text-2xl font-bold">${todayRevenue.toLocaleString()}</div>
+          <div className="text-2xl font-bold">
+            ${todayRevenue.toLocaleString()}
+          </div>
           <div className="text-green-600 text-xs mt-1">
             {todayGrowth >= 0 ? "+" : ""}
             {todayGrowth}% from last period
@@ -104,7 +110,9 @@ const OverviewPage: React.FC = () => {
         </div>
         <div className="bg-white rounded-lg p-4 shadow">
           <div className="text-gray-500 text-sm">Sales This Week</div>
-          <div className="text-2xl font-bold">${weekRevenue.toLocaleString()}</div>
+          <div className="text-2xl font-bold">
+            ${weekRevenue.toLocaleString()}
+          </div>
           <div className="text-green-600 text-xs mt-1">
             {weekGrowth >= 0 ? "+" : ""}
             {weekGrowth}% from last period
@@ -112,7 +120,9 @@ const OverviewPage: React.FC = () => {
         </div>
         <div className="bg-white rounded-lg p-4 shadow">
           <div className="text-gray-500 text-sm">Sales This Month</div>
-          <div className="text-2xl font-bold">${monthRevenue.toLocaleString()}</div>
+          <div className="text-2xl font-bold">
+            ${monthRevenue.toLocaleString()}
+          </div>
           <div className="text-green-600 text-xs mt-1">
             {monthGrowth >= 0 ? "+" : ""}
             {monthGrowth}% from last period
@@ -126,43 +136,43 @@ const OverviewPage: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {/* Pending */}
           <div className="border rounded-lg p-4 flex flex-col items-start bg-white">
-        <div className="flex items-center mb-2">
-          <span className="h-3 w-3 rounded-full bg-yellow-500 inline-block mr-2"></span>
-          <span className="text-gray-700 font-medium">Pending</span>
-        </div>
-        <div className="text-xl font-bold mt-1 ml-3">
-          {getOrderStatusCount(orders, "Pending")}
-        </div>
+            <div className="flex items-center mb-2">
+              <span className="h-3 w-3 rounded-full bg-yellow-500 inline-block mr-2"></span>
+              <span className="text-gray-700 font-medium">Pending</span>
+            </div>
+            <div className="text-xl font-bold mt-1 ml-3">
+              {getOrderStatusCount(orders, "Pending")}
+            </div>
           </div>
           {/* Shipped */}
           <div className="border rounded-lg p-4 flex flex-col items-start bg-white">
-        <div className="flex items-center mb-2">
-          <span className="h-3 w-3 rounded-full bg-blue-500 inline-block mr-2"></span>
-          <span className="text-gray-700 font-medium">Shipped</span>
-        </div>
-        <div className="text-xl font-bold mt-1 ml-3">
-          {getOrderStatusCount(orders, "Shipped")}
-        </div>
+            <div className="flex items-center mb-2">
+              <span className="h-3 w-3 rounded-full bg-blue-500 inline-block mr-2"></span>
+              <span className="text-gray-700 font-medium">Shipped</span>
+            </div>
+            <div className="text-xl font-bold mt-1 ml-3">
+              {getOrderStatusCount(orders, "Shipped")}
+            </div>
           </div>
           {/* Delivered */}
           <div className="border rounded-lg p-4 flex flex-col items-start bg-white">
-        <div className="flex items-center mb-2">
-          <span className="h-3 w-3 rounded-full bg-green-500 inline-block mr-2"></span>
-          <span className="text-gray-700 font-medium">Delivered</span>
-        </div>
-        <div className="text-xl font-bold mt-1 ml-3">
-          {getOrderStatusCount(orders, "Delivered")}
-        </div>
+            <div className="flex items-center mb-2">
+              <span className="h-3 w-3 rounded-full bg-green-500 inline-block mr-2"></span>
+              <span className="text-gray-700 font-medium">Delivered</span>
+            </div>
+            <div className="text-xl font-bold mt-1 ml-3">
+              {getOrderStatusCount(orders, "Delivered")}
+            </div>
           </div>
           {/* Cancelled */}
           <div className="border rounded-lg p-4 flex flex-col items-start bg-white">
-        <div className="flex items-center mb-2">
-          <span className="h-3 w-3 rounded-full bg-red-500 inline-block mr-2"></span>
-          <span className="text-gray-700 font-medium">Cancelled</span>
-        </div>
-        <div className="text-xl font-bold mt-1 ml-3">
-          {getOrderStatusCount(orders, "Cancelled")}
-        </div>
+            <div className="flex items-center mb-2">
+              <span className="h-3 w-3 rounded-full bg-red-500 inline-block mr-2"></span>
+              <span className="text-gray-700 font-medium">Cancelled</span>
+            </div>
+            <div className="text-xl font-bold mt-1 ml-3">
+              {getOrderStatusCount(orders, "Cancelled")}
+            </div>
           </div>
         </div>
       </div>
@@ -183,10 +193,16 @@ const OverviewPage: React.FC = () => {
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6 flex items-center justify-between">
         <div className="flex items-center text-yellow-700">
           <FiAlertCircle className="mr-2" />
-          You have <span className="font-semibold mx-1">{lowStockProducts} products</span>{" "}
+          You have{" "}
+          <span className="font-semibold mx-1">
+            {lowStockProducts} products
+          </span>{" "}
           running low. Restock now.
         </div>
-        <Link href={'/seller/products'} className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded hover:bg-yellow-200 transition">
+        <Link
+          href={"/seller/products"}
+          className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded hover:bg-yellow-200 transition"
+        >
           View Products
         </Link>
       </div>
@@ -195,4 +211,3 @@ const OverviewPage: React.FC = () => {
 };
 
 export default OverviewPage;
-

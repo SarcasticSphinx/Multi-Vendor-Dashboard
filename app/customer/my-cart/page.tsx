@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Trash2, ArrowRight, Tag, Store } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
 import Link from "next/link";
 
@@ -52,6 +52,9 @@ interface SelectedItem {
 
 const MyCart = () => {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const router = useRouter();
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [customerCart, setCustomerCart] = useState<CartProduct[]>([]);

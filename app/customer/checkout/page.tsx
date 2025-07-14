@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { CreditCard, Home, Building, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 interface Product {
   _id: string;
@@ -189,6 +189,9 @@ const fetchCustomer = async (id: string): Promise<CustomerInterface> => {
 const CheckOutPage: React.FC = () => {
   const router = useRouter();
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [checkoutProducts, setCheckoutProducts] = useState<Product[]>([]);

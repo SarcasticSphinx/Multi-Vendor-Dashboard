@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";;
 import { DialogHeader } from "@/components/ui/dialog";
+import { redirect } from "next/navigation";
 
 interface Order {
   _id: string;
@@ -48,6 +49,9 @@ interface Order {
 
 const SellerOrdersPage = () => {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

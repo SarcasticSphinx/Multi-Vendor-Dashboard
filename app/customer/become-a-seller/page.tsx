@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import axiosInstance from "@/lib/axios";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -75,6 +75,9 @@ const businessCategories = [
 
 export default function BecomeSellerPage() {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({

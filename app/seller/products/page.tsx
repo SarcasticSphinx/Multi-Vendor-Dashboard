@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Modal from "@/components/Modal";
 import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 interface Product {
   _id: string;
@@ -22,6 +23,9 @@ interface Product {
 
 const ProductsPage = () => {
   const {data: session} = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [sellerId, setSellerId] = useState<string>("");
 
   useEffect(()=> {

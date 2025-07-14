@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Store, ShoppingCart } from "lucide-react";
@@ -45,6 +45,9 @@ interface GroupedWishlist {
 
 const Wishlist: React.FC = () => {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const router = useRouter();
   // const [customerId, setCustomerId] = useState<string | null>(null);
   const [customerWishlist, setCustomerWishlist] = useState<Product[]>([]);

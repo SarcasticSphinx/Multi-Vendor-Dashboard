@@ -2,8 +2,14 @@
 import { CreditCard, Clock } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 const PaymentPage = () => {
+  const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   return (
     <div className="mx-auto p-6">
       <div className="mb-6">

@@ -15,6 +15,7 @@ import axiosInstance from "@/lib/axios";
 import Loading from "@/components/Loading";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
+import { redirect } from "next/navigation";
 
 interface PopulatedUser {
   _id: string;
@@ -211,6 +212,9 @@ const AddressDialog = ({
 
 export default function ProfilePage() {
   const { data: session } = useSession();
+  if (!session) {
+    redirect("/login");
+  }
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [customer, setCustomer] = useState<CustomerInterface | null>(null);
