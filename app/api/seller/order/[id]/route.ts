@@ -5,11 +5,10 @@ import Order from "@/models/Order.model"; // Make sure Order model is correctly 
 import Seller from "@/models/Seller.model"; // Make sure Seller model is correctly imported and defined
 import Product from "@/models/Product.model";
 
-// Define the type for context.params
-type Params = { id: string };
+type Params = Promise<{ id: string }>;
 
 export async function GET(req: NextRequest, context: { params: Params }) {
-    const params = await context.params;
+  const params = await context.params;
   const id = params.id;
   try {
     await connectToMongoDB();
@@ -20,7 +19,7 @@ export async function GET(req: NextRequest, context: { params: Params }) {
     // If your models are consistently registered (e.g., via a global mongoose.model call), this might not be strictly necessary.
     // However, it doesn't hurt and ensures models are loaded.
     await Order.db.asPromise(); // Ensures models are registered and available
-    await Seller.db.asPromise(); 
+    await Seller.db.asPromise();
     await Product.db.asPromise();
 
     // Validate ID format
@@ -46,8 +45,8 @@ export async function GET(req: NextRequest, context: { params: Params }) {
           {
             path: "orderItems.product",
             model: "Product",
-          }
-        ]
+          },
+        ],
       });
 
     if (!seller) {
