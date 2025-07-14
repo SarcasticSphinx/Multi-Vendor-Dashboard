@@ -25,20 +25,22 @@ interface Order {
 }
 
 const SellerOrdersPage = () => {
-  const {data: session} = useSession();
+  const { data: session } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  console.log("Session Data:", session);
+  // console.log("Session Data:", session);
   useEffect(() => {
     const fetchOrders = async () => {
       if (!session?.user.id) return;
       try {
         setLoading(true);
-        const response = await axiosInstance.get(`/seller/order/${session?.user.id}`);
-        setOrders(response.data);
+        const response = await axiosInstance.get(
+          `/seller/order/${session?.user.id}`
+        );
+        setOrders(response.data.orders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
@@ -79,36 +81,39 @@ const SellerOrdersPage = () => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold mb-2">Orders</h1>
-        <p className="text-gray-500 text-sm">
-          Search by order id or customer name
-        </p>
       </div>
-
-      {/* Status Tabs */}
-      <Tabs
-        value={statusFilter}
-        onValueChange={setStatusFilter}
-        className="mb-6"
-      >
-        <TabsList>
-          <TabsTrigger value="All">All</TabsTrigger>
-          <TabsTrigger value="Pending">Pending</TabsTrigger>
-          <TabsTrigger value="Shipped">Shipped</TabsTrigger>
-          <TabsTrigger value="Cancelled">Cancelled</TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      {/* Search Bar */}
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <input
           type="text"
-          placeholder="Search orders..."
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          placeholder="Search by order id or customer name"
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+      {/* Status Tabs */}
+
+      <Tabs
+        value={statusFilter}
+        onValueChange={setStatusFilter}
+        className="mb-6 w-full"
+      >
+        <TabsList className="grid grid-cols-4 w-full mb-4 h-full p-1">
+          <TabsTrigger className="py-2" value="All">
+            All
+          </TabsTrigger>
+          <TabsTrigger className="py-2" value="Pending">
+            Pending
+          </TabsTrigger>
+          <TabsTrigger className="py-2" value="Shipped">
+            Shipped
+          </TabsTrigger>
+          <TabsTrigger className="py-2" value="Cancelled">
+            Cancelled
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* Orders Table */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
