@@ -188,125 +188,130 @@ const Wishlist: React.FC = () => {
   }
 
   return (
-    <div className=" p-6 ">
+    <div className="p-4 sm:p-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-2">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Wishlist</h1>
-          <p className="text-gray-500 text-sm">
-            Manage your saved items across multiple wishlists
-          </p>
-        </div>
-        <Button className="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-sm flex items-center gap-2 text-sm font-medium">
-          <Plus size={16} />
-          Create New List
-        </Button>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+      <div>
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Wishlist</h1>
+        <p className="text-gray-500 text-sm">
+        Manage your saved items across multiple wishlists
+        </p>
+      </div>
+      <Button className="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-sm flex items-center gap-2 text-sm font-medium w-full sm:w-auto">
+        <Plus size={16} />
+        Create New List
+      </Button>
       </div>
 
       {/* Add All To Cart Button */}
-      <div className="mb-6">
-        <Button
-          onClick={addAllToCart}
-          disabled={updating || customerWishlist.length === 0}
-          variant="outline"
-          className="text-gray-600 hover:text-gray-800 flex items-center gap-2 text-sm font-medium border border-gray-300 px-4 py-2 rounded-sm hover:bg-gray-50"
-        >
-          <Plus size={16} />
-          Add All To Cart
-        </Button>
+      <div className="mb-4 sm:mb-6">
+      <Button
+        onClick={addAllToCart}
+        disabled={updating || customerWishlist.length === 0}
+        variant="outline"
+        className="text-gray-600 hover:text-gray-800 flex items-center gap-2 text-sm font-medium border border-gray-300 px-4 py-2 rounded-sm hover:bg-gray-50 w-full sm:w-auto"
+      >
+        <Plus size={16} />
+        Add All To Cart
+      </Button>
       </div>
 
       {/* Wishlist Items */}
       {Object.keys(groupedWishlist).length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">Your wishlist is empty</p>
-          <Button
-            onClick={() => router.push("/customer")}
-            className="bg-secondary text-white font-medium"
-          >
-            Continue Shopping
-          </Button>
-        </div>
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">Your wishlist is empty</p>
+        <Button
+        onClick={() => router.push("/customer")}
+        className="bg-secondary text-white font-medium mt-4"
+        >
+        Continue Shopping
+        </Button>
+      </div>
       ) : (
-        <div className="space-y-6">
-          {Object.entries(groupedWishlist).map(
-            ([sellerName, products], sellerIndex) => (
-              <div
-                key={sellerIndex}
-                className="border border-gray-200 rounded-lg"
-              >
-                {/* Seller Header */}
-                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={isSellerSelected(products)}
-                    onChange={() => handleSellerCheckboxChange(products)}
-                    className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-                  />
-                  <Store size={16} className="text-gray-500" />
-                  <span className="text-gray-700 font-medium">
-                    {sellerName}
-                  </span>
-                </div>
+      <div className="space-y-6">
+        {Object.entries(groupedWishlist).map(
+        ([sellerName, products], sellerIndex) => (
+          <div
+          key={sellerIndex}
+          className="border border-gray-200 rounded-lg"
+          >
+          {/* Seller Header */}
+          <div className="bg-gray-50 px-3 sm:px-4 py-3 border-b border-gray-200 flex items-center gap-2">
+            <input
+            type="checkbox"
+            checked={isSellerSelected(products)}
+            onChange={() => handleSellerCheckboxChange(products)}
+            className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+            />
+            <Store size={16} className="text-gray-500" />
+            <span className="text-gray-700 font-medium text-sm sm:text-base">
+            {sellerName}
+            </span>
+          </div>
 
-                {/* Items */}
-                <div className="divide-y divide-gray-200">
-                  {products.map((item: Product) => (
-                    <div key={item._id} className="p-4 flex items-center gap-4">
-                      <input
-                        type="checkbox"
-                        checked={isItemSelected(item._id)}
-                        onChange={() => handleSelectItem(item._id)}
-                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-                      />
+          {/* Items */}
+          <div className="divide-y divide-gray-200">
+            {products.map((item: Product) => (
+            <div
+              key={item._id}
+              className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4"
+            >
+              <div className="flex items-center gap-2 sm:gap-4 w-full">
+              <input
+                type="checkbox"
+                checked={isItemSelected(item._id)}
+                onChange={() => handleSelectItem(item._id)}
+                className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+              />
 
-                      <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 relative">
-                        <Image
-                          src={
-                            item.productImages[0] || "/placeholder-product.jpg"
-                          }
-                          alt={item.productTitle}
-                          fill
-                          className="object-cover rounded-lg"
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-900 text-sm mb-1">
-                          {item.productTitle}
-                        </h3>
-                        <p className="text-gray-500 text-sm">
-                          {item.colour} | {item.condition}
-                        </p>
-                        <p className="text-gray-900 font-semibold text-sm mt-2">
-                          ${item.salePrice || item.price}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => removeWishlistItem(item._id)}
-                          disabled={updating}
-                          className="p-2 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                        <Button
-                          onClick={() => addToCart(item._id)}
-                          disabled={updating}
-                          className="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2"
-                        >
-                          <ShoppingCart size={16} />
-                          Add to Cart
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-lg flex-shrink-0 relative">
+                <Image
+                src={
+                  item.productImages[0] || "/placeholder-product.jpg"
+                }
+                alt={item.productTitle}
+                fill
+                className="object-cover rounded-lg"
+                />
               </div>
-            )
-          )}
-        </div>
+
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
+                {item.productTitle}
+                </h3>
+                <p className="text-gray-500 text-xs sm:text-sm">
+                {item.colour} | {item.condition}
+                </p>
+                <p className="text-gray-900 font-semibold text-sm mt-2">
+                ${item.salePrice || item.price}
+                </p>
+              </div>
+              </div>
+
+              <div className="flex flex-row sm:flex-col justify-end items-end gap-2 flex-shrink-0 mt-2 sm:mt-0 w-full sm:w-auto">
+              <button
+                onClick={() => removeWishlistItem(item._id)}
+                disabled={updating}
+                className="p-2 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+              >
+                <Trash2 size={18} />
+              </button>
+              <Button
+                onClick={() => addToCart(item._id)}
+                disabled={updating}
+                className="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2 w-1/2 sm:w-auto"
+              >
+                <ShoppingCart size={16} />
+                Add to Cart
+              </Button>
+              </div>
+            </div>
+            ))}
+          </div>
+          </div>
+        )
+        )}
+      </div>
       )}
     </div>
   );

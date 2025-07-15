@@ -186,7 +186,7 @@ const Settings = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-6 items-start">
+          <div className="flex flex-col md:flex-row gap-6 sm:items-start">
             <div className="flex flex-col items-center gap-4">
               <Avatar className="w-24 h-24 flex justify-center items-center">
                 {isUpdating ? (

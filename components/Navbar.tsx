@@ -1,20 +1,41 @@
 "use client";
 
 import React from "react";
-import { Globe, Bell, HelpCircle } from "lucide-react";
+import { Globe, Bell, PanelLeft } from "lucide-react";
 import { FaChevronDown } from "react-icons/fa";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSidebar } from "@/components/Sidebar";
 
 const Navbar: React.FC = () => {
   const { data: session } = useSession();
+  const router = useRouter();
+  const { setIsMobileOpen } = useSidebar();
 
   return (
-    <nav className="w-full border-b border-gray-200 bg-white lg:px-20 fixed top-0 left-0 z-50 shadow-sm">
+    <nav className="w-full border-b border-gray-200 bg-white fixed top-0 left-0 z-50 shadow-sm">
       <div className="flex items-center justify-between px-4 sm:px-8 py-4">
-        {/* Logo */}
-        <div className="font-bold text-xl sm:text-2xl text-secondary cursor-pointer" onClick={() => redirect('/')}>Logo</div>
+        {/* Left section - Mobile menu trigger + Logo */}
+        <div className="flex items-center gap-3">
+          {/* Mobile sidebar trigger - only show on mobile when logged in */}
+          {session?.user && (
+            <button
+              onClick={() => setIsMobileOpen(true)}
+              className="md:hidden flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 transition"
+            >
+              <PanelLeft size={20} />
+            </button>
+          )}
+          
+          {/* Logo */}
+          <div 
+            className="font-bold text-xl sm:text-2xl text-secondary cursor-pointer"
+            onClick={() => router.push('/')}
+          >
+            Logo
+          </div>
+        </div>
 
         {/* Right section */}
         <div className="flex items-center gap-2 sm:gap-6">
@@ -26,10 +47,10 @@ const Navbar: React.FC = () => {
           </button>
 
           {/* Help - Show icon only on mobile */}
-          <button className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition">
+          {/* <button className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition">
             <HelpCircle size={20} />
             <span className="hidden sm:inline text-sm font-medium">Help</span>
-          </button>
+          </button> */}
 
           {session?.user ? (
             <>
@@ -66,10 +87,10 @@ const Navbar: React.FC = () => {
               {/* Sign Out - Text hidden on mobile */}
               <button
                 onClick={() => signOut()}
-                className="px-2 sm:px-4 py-2 bg-secondary text-white rounded-md hover:bg-secondary transition text-sm"
+                className="px-2 sm:px-4 py-2 bg-secondary text-white rounded-md hover:bg-secondary/90 transition text-sm"
               >
                 <span className="hidden sm:inline">Sign Out</span>
-                <span className="sm:hidden">Sign out</span>
+                <span className="sm:hidden">Out</span>
               </button>
             </>
           ) : (
@@ -77,8 +98,7 @@ const Navbar: React.FC = () => {
               href="/login"
               className="px-3 sm:px-4 py-2 border border-secondary hover:bg-secondary hover:text-white rounded-md transition text-sm"
             >
-              <span className="hidden sm:inline">SignIn</span>
-              <span className="sm:hidden">SignIn</span>
+              Sign In
             </Link>
           )}
         </div>

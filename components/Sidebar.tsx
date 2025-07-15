@@ -1,15 +1,39 @@
 "use client";
 
-import React from "react";
+import React, { createContext, useContext, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Box, CircleHelp, CreditCard, Heart, House, Settings, ShoppingCart, Truck, UserRound } from "lucide-react";
+import { Box, CircleHelp, CreditCard, Heart, House, Settings, ShoppingCart, Truck, UserRound, X } from "lucide-react";
 import { useSession } from "next-auth/react";
+
+// Context for sidebar state
+const SidebarContext = createContext<{
+  isMobileOpen: boolean;
+  setIsMobileOpen: (open: boolean) => void;
+}>({
+  isMobileOpen: false,
+  setIsMobileOpen: () => {},
+});
+
+export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  
+  return (
+    <SidebarContext.Provider value={{ isMobileOpen, setIsMobileOpen }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
+
+export const useSidebar = () => useContext(SidebarContext);
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { isMobileOpen, setIsMobileOpen } = useSidebar();
+  
   if (!session) return null;
+  
   const isSeller = session?.user.role === "seller";
   const navItems = isSeller
     ? [
@@ -28,21 +52,33 @@ const Sidebar: React.FC = () => {
         { path: "/customer/settings", label: "Settings", icon: <Settings size={24} /> }
       ];
 
+  const handleLinkClick = () => {
+    setIsMobileOpen(false);
+  };
+
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="min-w-80 min-h-screen bg-white border-r border-gray-200 fixed flex pl-20 pr-4 top-0 pt-40 hidden md:flex">
-        <nav className="mt-4 w-full ">
-          <ul className="space-y-2 w-full">
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Desktop Sidebar - Full width with labels */}
+      <aside className="hidden lg:flex fixed left-0 top-20 pt-20 h-screen w-64 bg-white border-r border-gray-200 z-30">
+        <nav className="flex-1 px-4 py-6">
+          <ul className="space-y-2">
             {navItems.map((item) => (
-              <li key={item.path} className="w-full">
+              <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`flex items-center gap-3 px-4 py-2 rounded-md transition-colors w-full
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                     ${
                       pathname.includes(item.path)
                         ? "bg-red-50 text-red-600 font-medium"
-                        : "text-gray-600 hover:bg-gray-100"
+                        : "text-gray-700 hover:bg-gray-100"
                     }
                   `}
                 >
@@ -55,24 +91,67 @@ const Sidebar: React.FC = () => {
         </nav>
       </aside>
 
-      {/* Mobile side Navigation */}
-      <nav className="fixed top-0 pt-42 min-w-14 bottom-0 left-0 bg-white border-t border-gray-200 flex flex-col gap-6 items-center py-6 md:hidden z-4">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            href={item.path}
-            className={`flex flex-col items-center justify-center px-2
-              ${
-                pathname.includes(item.path)
-                  ? "text-red-600"
-                  : "text-gray-600"
-              }
-            `}
+      {/* Tablet Sidebar - Icon only */}
+      <aside className="hidden md:flex lg:hidden fixed left-0 top-18 pt-20 h-full w-16 bg-white border-r border-gray-200 z-30">
+        <nav className="flex-1 px-2 py-6">
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  href={item.path}
+                  className={`flex items-center justify-center w-12 h-12 rounded-lg transition-colors
+                    ${
+                      pathname.includes(item.path)
+                        ? "bg-red-50 text-red-600"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }
+                  `}
+                  title={item.label}
+                >
+                  {item.icon}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Mobile Sidebar - Slide out */}
+      <aside className={`fixed left-0 top-0 pt-20 h-full w-64 bg-white border-r border-gray-200 z-50 transition-transform duration-300 md:hidden ${
+        isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <h2 className="font-semibold text-gray-800">Menu</h2>
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            {item.icon}
-          </Link>
-        ))}
-      </nav>
+            <X size={20} />
+          </button>
+        </div>
+        <nav className="flex-1 px-4 py-6">
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  href={item.path}
+                  onClick={handleLinkClick}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+                    ${
+                      pathname.includes(item.path)
+                        ? "bg-red-50 text-red-600 font-medium"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
     </>
   );
 };

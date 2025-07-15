@@ -161,232 +161,326 @@ const MyOrdersPage: React.FC = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 ">
+    <div className="mx-auto p-4 sm:p-6">
 
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">My Orders</h1>
-        <p className="text-gray-500 text-sm">
-          View and manage your order history.
-        </p>
+      <h1 className="text-2xl font-semibold text-gray-900 mb-2">My Orders</h1>
+      <p className="text-gray-500 text-sm">
+        View and manage your order history.
+      </p>
       </div>
 
       {/* Search and Filter */}
-      <div className="flex gap-4 mb-6 items-center">
-        <div className="flex-1 relative bg-white">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search by order ID..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          />
-        </div>
-        <div className="relative py-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-            variant="outline"
-            className="flex items-center justify-between w-48 px-4 py-2"
-              >
-            {statusFilter === "all"
-              ? "Order Status"
-              : getStatusText(statusFilter)}
-            <span className="ml-2">
-             <ChevronDown />
-            </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => setStatusFilter("all")}>
-            Order Status
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("delivered")}>
-            Delivered
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("shipped")}>
-            Shipped
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("processing")}>
-            Processing
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("cancelled")}>
-            Cancelled
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("pending")}>
-            Pending
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("confirmed")}>
-            Confirmed
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("partially_shipped")}>
-            Partially Shipped
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("completed")}>
-            Completed
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("refunded")}>
-            Refunded
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("dispute")}>
-            Dispute
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <div className="flex flex-col sm:flex-row gap-4 mb-6 items-stretch sm:items-center">
+      <div className="flex-1 relative bg-white">
+        <Search
+        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+        size={20}
+        />
+        <input
+        type="text"
+        placeholder="Search by order ID..." 
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full pl-10 pr-4 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+        />
+      </div>
+      <div className="relative py-2">
+        <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+          variant="outline"
+          className="flex items-center justify-between w-full sm:w-48 px-4 py-2"
+          >
+          {statusFilter === "all"
+            ? "Order Status"
+            : getStatusText(statusFilter)}
+          <span className="ml-2">
+            <ChevronDown />
+          </span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-48">
+          <DropdownMenuItem onClick={() => setStatusFilter("all")}>
+          Order Status
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("delivered")}>
+          Delivered
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("shipped")}>
+          Shipped
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("processing")}>
+          Processing
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("cancelled")}>
+          Cancelled
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("pending")}>
+          Pending
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("confirmed")}>
+          Confirmed
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("partially_shipped")}>
+          Partially Shipped
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("completed")}>
+          Completed
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("refunded")}>
+          Refunded
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setStatusFilter("dispute")}>
+          Dispute
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        {/* Table Header */}
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-          <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-500">
-            <div>Order ID</div>
-            <div>Date</div>
-            <div>Status</div>
-            <div>Total</div>
-            <div>Actions</div>
-            <div></div>
-          </div>
+      <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+      {/* Table Header */}
+      <div className="bg-gray-50 px-4 sm:px-6 py-4 border-b border-gray-200 hidden sm:block">
+        <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-500">
+        <div>Order ID</div>
+        <div>Date</div>
+        <div>Status</div>
+        <div>Total</div>
+        <div>Actions</div>
+        <div></div>
         </div>
+      </div>
 
-        {/* Table Body */}
-        <div className="divide-y divide-gray-200">
-          {filteredOrders.length > 0 ? (
-            filteredOrders.map((order) => (
-              <div key={order.orderId} className="px-6 py-4">
-                {" "}
-                {/* Use _id for key */}
-                <div className="grid grid-cols-6 gap-4 items-center">
-                  {/* Order ID - use _id from backend data */}
-                  <div className="text-sm font-medium text-gray-900 whitespace-wrap">
-                    #{order.orderId} {/* Display _id directly */}
-                  </div>
-
-                  {/* Date */}
-                  <div className="text-sm text-gray-500">
-                    {formatDate(order.createdAt)}
-                  </div>
-
-                  {/* Status - null-safe access */}
-                  <div>
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                        order.orderStatus || ""
-                      )}`}
-                    >
-                      {getStatusText(order.orderStatus || "Unknown")}
-                    </span>
-                  </div>
-
-                  {/* Total - use pricing.total and null-safe */}
-                  <div className="text-sm font-medium text-gray-900">
-                    ${(order.pricing?.total ?? 0).toFixed(2)}
-                  </div>
-
-                  {/* Actions - null-safe access */}
-                  <div className="flex items-center gap-2">
-                    {/* Ensure order.orderStatus is not null/undefined before comparison */}
-                    {order.orderStatus === "pending" && (
-                      <Button
-                        onClick={() => handleBuyAgain(order._id)}
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1 text-xs"
-                      >
-                        <CreditCard size={14} />
-                        pay now
-                      </Button>
-                    )}
-                    {order.orderStatus === "delivered" && (
-                      <Button
-                        onClick={() => handleBuyAgain(order._id)}
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1 text-xs"
-                      >
-                        <RotateCcw size={14} />
-                        Buy Again
-                      </Button>
-                    )}
-                    {order.orderStatus === "shipped" && (
-                      <Button
-                        onClick={() => handleTrack(order._id)}
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1 text-xs"
-                      >
-                        <MapPin size={14} />
-                        Track
-                      </Button>
-                    )}
-                    {order.orderStatus === "processing" && (
-                      <Button
-                        onClick={() => handleCancel(order._id)}
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700"
-                      >
-                        <X size={14} />
-                        Cancel
-                      </Button>
-                    )}
-                    {order.orderStatus === "cancelled" && (
-                      <Button
-                        onClick={() => handleReorder(order._id)}
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1 text-xs"
-                      >
-                        <Package size={14} />
-                        Reorder
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* More Options */}
-                  <div className="flex justify-end">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="p-1 h-8 w-8">
-                          <MoreHorizontal size={16} className="text-gray-400" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleCancel(order._id)}
-                          className="text-red-600"
-                        >
-                          Discard Order
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => console.log("Update order:", order._id)}
-                        >
-                          Update Order
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-12">
-              <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-gray-500 text-lg">No orders found</p>
-              <p className="text-gray-400 text-sm">
-                Try adjusting your search or filter criteria
-              </p>
+      {/* Table Body */}
+      <div className="divide-y divide-gray-200">
+        {filteredOrders.length > 0 ? (
+        filteredOrders.map((order) => (
+          <div key={order.orderId} className="px-4 sm:px-6 py-4">
+          {/* Desktop/Table Row */}
+          <div className="hidden sm:grid grid-cols-6 gap-4 items-center">
+            {/* Order ID */}
+            <div className="text-sm font-medium text-gray-900 whitespace-wrap">
+            #{order.orderId}
             </div>
-          )}
+            {/* Date */}
+            <div className="text-sm text-gray-500">
+            {formatDate(order.createdAt)}
+            </div>
+            {/* Status */}
+            <div>
+            <span
+              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+              order.orderStatus || ""
+              )}`}
+            >
+              {getStatusText(order.orderStatus || "Unknown")}
+            </span>
+            </div>
+            {/* Total */}
+            <div className="text-sm font-medium text-gray-900">
+            ${(order.pricing?.total ?? 0).toFixed(2)}
+            </div>
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+            {order.orderStatus === "pending" && (
+              <Button
+              onClick={() => handleBuyAgain(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              >
+              <CreditCard size={14} />
+              pay now
+              </Button>
+            )}
+            {order.orderStatus === "delivered" && (
+              <Button
+              onClick={() => handleBuyAgain(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              >
+              <RotateCcw size={14} />
+              Buy Again
+              </Button>
+            )}
+            {order.orderStatus === "shipped" && (
+              <Button
+              onClick={() => handleTrack(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              >
+              <MapPin size={14} />
+              Track
+              </Button>
+            )}
+            {order.orderStatus === "processing" && (
+              <Button
+              onClick={() => handleCancel(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700"
+              >
+              <X size={14} />
+              Cancel
+              </Button>
+            )}
+            {order.orderStatus === "cancelled" && (
+              <Button
+              onClick={() => handleReorder(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              >
+              <Package size={14} />
+              Reorder
+              </Button>
+            )}
+            </div>
+            {/* More Options */}
+            <div className="flex justify-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-1 h-8 w-8">
+                <MoreHorizontal size={16} className="text-gray-400" />
+              </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => handleCancel(order._id)}
+                className="text-red-600"
+              >
+                Discard Order
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => console.log("Update order:", order._id)}
+              >
+                Update Order
+              </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            </div>
+          </div>
+          {/* Mobile/Card Row */}
+          <div className="sm:hidden flex flex-col gap-2 border-b border-gray-100 pb-4">
+            <div className="flex justify-between items-center">
+            <div className="font-semibold text-gray-900 text-base">
+              #{order.orderId}
+            </div>
+            <span
+              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+              order.orderStatus || ""
+              )}`}
+            >
+              {getStatusText(order.orderStatus || "Unknown")}
+            </span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-500">
+            <span>Date:</span>
+            <span>{formatDate(order.createdAt)}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-500">
+            <span>Total:</span>
+            <span>${(order.pricing?.total ?? 0).toFixed(2)}</span>
+            </div>
+            <div className="flex gap-2 mt-2 flex-wrap">
+            {order.orderStatus === "pending" && (
+              <Button
+              onClick={() => handleBuyAgain(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              >
+              <CreditCard size={14} />
+              pay now
+              </Button>
+            )}
+            {order.orderStatus === "delivered" && (
+              <Button
+              onClick={() => handleBuyAgain(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              >
+              <RotateCcw size={14} />
+              Buy Again
+              </Button>
+            )}
+            {order.orderStatus === "shipped" && (
+              <Button
+              onClick={() => handleTrack(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              >
+              <MapPin size={14} />
+              Track
+              </Button>
+            )}
+            {order.orderStatus === "processing" && (
+              <Button
+              onClick={() => handleCancel(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700"
+              >
+              <X size={14} />
+              Cancel
+              </Button>
+            )}
+            {order.orderStatus === "cancelled" && (
+              <Button
+              onClick={() => handleReorder(order._id)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              >
+              <Package size={14} />
+              Reorder
+              </Button>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-1 h-8 w-8">
+                <MoreHorizontal size={16} className="text-gray-400" />
+              </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => handleCancel(order._id)}
+                className="text-red-600"
+              >
+                Discard Order
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => console.log("Update order:", order._id)}
+              >
+                Update Order
+              </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            </div>
+          </div>
+          </div>
+        ))
+        ) : (
+        <div className="text-center py-12">
+          <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <p className="text-gray-500 text-lg">No orders found</p>
+          <p className="text-gray-400 text-sm">
+          Try adjusting your search or filter criteria
+          </p>
         </div>
+        )}
+      </div>
       </div>
     </div>
   );
 };
 
 export default MyOrdersPage;
+

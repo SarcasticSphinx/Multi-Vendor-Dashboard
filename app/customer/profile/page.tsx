@@ -389,342 +389,342 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-6 pb-12 min-h-screen">
+    <div className="p-4 pb-12 min-h-screen md:p-6">
       <h1 className="text-2xl font-semibold">Profile</h1>
       <p className="text-sm text-gray-500 mb-6">
-        Manage your account settings and preferences.
+      Manage your account settings and preferences.
       </p>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid grid-cols-3 w-full mb-4 h-full p-1">
-          <TabsTrigger className="py-2" value="personal">
-            Personal
-          </TabsTrigger>
-          <TabsTrigger className="py-2" value="address">
-            Address
-          </TabsTrigger>
-          <TabsTrigger className="py-2" value="transactions">
-            Transactions
-          </TabsTrigger>
-        </TabsList>
+      <TabsList className="grid grid-cols-3 w-full mb-4 h-full p-1 gap-2 md:gap-0">
+        <TabsTrigger className="py-2 w-full" value="personal">
+        Personal
+        </TabsTrigger>
+        <TabsTrigger className="py-2 w-full" value="address">
+        Address
+        </TabsTrigger>
+        <TabsTrigger className="py-2 w-full" value="transactions">
+        Transactions
+        </TabsTrigger>
+      </TabsList>
 
-        {/* PERSONAL TAB */}
-        <TabsContent value="personal">
-          <Card className="bg-gray-50 shadow-none border-none p-0 m-0">
-            <CardContent className="space-y-6 m-0 p-0">
-              {/* Personal Information */}
-              <div className="p-8 bg-white rounded-sm shadow-sm border">
-                <h2 className="font-semibold mb-1 text-xl">
-                  Personal Information
-                </h2>
-                <p className="text-sm text-gray-500 mb-4">
-                  Update your personal details.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">First name</Label>
-                    <Input
-                      id="firstName"
-                      value={personalInfo.firstName}
-                      onChange={(e) => setPersonalInfo({...personalInfo, firstName: e.target.value})}
-                      placeholder="First name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Last name</Label>
-                    <Input
-                      id="lastName"
-                      value={personalInfo.lastName}
-                      onChange={(e) => setPersonalInfo({...personalInfo, lastName: e.target.value})}
-                      placeholder="Last name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      value={personalInfo.email}
-                      onChange={(e) => setPersonalInfo({...personalInfo, email: e.target.value})}
-                      placeholder="Email"
-                      disabled
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={personalInfo.phone}
-                      onChange={(e) => setPersonalInfo({...personalInfo, phone: e.target.value})}
-                      placeholder="Phone"
-                    />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    value={personalInfo.bio}
-                    onChange={(e) => setPersonalInfo({...personalInfo, bio: e.target.value})}
-                    rows={3}
-                    placeholder="Tell us about yourself"
-                  />
-                </div>
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline">
-                    Cancel
-                  </Button>
-                  <Button 
-                    onClick={handleSavePersonalInfo}
-                    className="bg-secondary text-white"
-                    disabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Save Changes"}
-                  </Button>
-                </div>
+      {/* PERSONAL TAB */}
+      <TabsContent value="personal">
+        <Card className="bg-gray-50 shadow-none border-none p-0 m-0">
+        <CardContent className="space-y-6 m-0 p-0">
+          {/* Personal Information */}
+          <div className="p-4 md:p-8 bg-white rounded-sm shadow-sm border">
+          <h2 className="font-semibold mb-1 text-xl">
+            Personal Information
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Update your personal details.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+            <Label htmlFor="firstName">First name</Label>
+            <Input
+              id="firstName"
+              value={personalInfo.firstName}
+              onChange={(e) => setPersonalInfo({...personalInfo, firstName: e.target.value})}
+              placeholder="First name"
+            />
+            </div>
+            <div>
+            <Label htmlFor="lastName">Last name</Label>
+            <Input
+              id="lastName"
+              value={personalInfo.lastName}
+              onChange={(e) => setPersonalInfo({...personalInfo, lastName: e.target.value})}
+              placeholder="Last name"
+            />
+            </div>
+            <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              value={personalInfo.email}
+              onChange={(e) => setPersonalInfo({...personalInfo, email: e.target.value})}
+              placeholder="Email"
+              disabled
+            />
+            </div>
+            <div>
+            <Label htmlFor="phone">Phone</Label>
+            <Input
+              id="phone"
+              value={personalInfo.phone}
+              onChange={(e) => setPersonalInfo({...personalInfo, phone: e.target.value})}
+              placeholder="Phone"
+            />
+            </div>
+          </div>
+          <div className="mt-4">
+            <Label htmlFor="bio">Bio</Label>
+            <Textarea
+            id="bio"
+            value={personalInfo.bio}
+            onChange={(e) => setPersonalInfo({...personalInfo, bio: e.target.value})}
+            rows={3}
+            placeholder="Tell us about yourself"
+            />
+          </div>
+          <div className="flex flex-col md:flex-row justify-between mt-6 gap-2">
+            <Button variant="outline">
+            Cancel
+            </Button>
+            <Button 
+            onClick={handleSavePersonalInfo}
+            className="bg-secondary text-white"
+            disabled={isSaving}
+            >
+            {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
+          </div>
+
+          {/* Notification Preferences */}
+          <div className="p-4 md:p-8 bg-white rounded-sm shadow-sm border">
+          <h2 className="font-semibold mb-1 mt-8 text-xl">
+            Notification Preferences
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Manage how you receive notifications.
+          </p>
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between border-b pb-3 gap-2">
+            <Label htmlFor="orderUpdates">Order Updates</Label>
+            <Switch
+              id="orderUpdates"
+              className="data-[state=checked]:bg-secondary"
+              checked={notificationPrefs.orderUpdates}
+              onCheckedChange={(checked) => 
+              setNotificationPrefs(prev => ({ ...prev, orderUpdates: checked }))
+              }
+            />
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between border-b pb-3 gap-2">
+            <Label htmlFor="promotionsAndDeals">Promotions and deals</Label>
+            <Switch
+              id="promotionsAndDeals"
+              className="data-[state=checked]:bg-secondary"
+              checked={notificationPrefs.promotionsAndDeals}
+              onCheckedChange={(checked) => 
+              setNotificationPrefs(prev => ({ ...prev, promotionsAndDeals: checked }))
+              }
+            />
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between border-b pb-3 gap-2">
+            <Label htmlFor="newsletter">Newsletter</Label>
+            <Switch
+              id="newsletter"
+              className="data-[state=checked]:bg-secondary"
+              checked={notificationPrefs.newsletter}
+              onCheckedChange={(checked) => 
+              setNotificationPrefs(prev => ({ ...prev, newsletter: checked }))
+              }
+            />
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <Label htmlFor="wishlistUpdates">Wishlist updates</Label>
+            <Switch
+              id="wishlistUpdates"
+              className="data-[state=checked]:bg-secondary"
+              checked={notificationPrefs.wishlistUpdates}
+              onCheckedChange={(checked) => 
+              setNotificationPrefs(prev => ({ ...prev, wishlistUpdates: checked }))
+              }
+            />
+            </div>
+          </div>
+          <div className="flex justify-end mt-6">
+            <Button 
+            onClick={handleSaveNotificationPrefs}
+            className="bg-secondary text-white"
+            disabled={isSaving}
+            >
+            {isSaving ? "Saving..." : "Save Preferences"}
+            </Button>
+          </div>
+          </div>
+        </CardContent>
+        </Card>
+      </TabsContent>
+
+      {/* ADDRESS TAB */}
+      <TabsContent value="address">
+        <Card>
+        <CardContent className="p-4 md:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+          <div>
+            <h2 className="font-semibold mb-1 text-xl">Addresses</h2>
+            <p className="text-sm text-gray-500">
+            Manage your shipping and billing addresses.
+            </p>
+          </div>
+          <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
+            <DialogTrigger asChild>
+            <Button 
+              className="bg-secondary text-white"
+              onClick={() => {
+              setEditingAddressIndex(null);
+              setCurrentAddress(emptyAddress);
+              }}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Address
+            </Button>
+            </DialogTrigger>
+            <AddressDialog
+            open={isAddressModalOpen}
+            onOpenChange={setIsAddressModalOpen}
+            onSave={handleAddOrUpdateAddress}
+            initialAddress={currentAddress}
+            />
+          </Dialog>
+          </div>
+
+          <div className="space-y-4">
+          {customer.addresses && customer.addresses.length > 0 ? (
+            customer.addresses.map((address, index) => (
+            <div key={index} className="border p-4 rounded-sm">
+              <div className="flex items-center gap-2 mb-1">
+              <MapPin className="h-4 w-4 text-gray-400" />
+              <span className="font-medium">{address.type || "Address"}</span>
+              {address.isDefault && (
+                <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-sm">
+                Default
+                </span>
+              )}
               </div>
-
-              {/* Notification Preferences */}
-              <div className="p-8 bg-white rounded-sm shadow-sm border">
-                <h2 className="font-semibold mb-1 mt-8 text-xl">
-                  Notification Preferences
-                </h2>
-                <p className="text-sm text-gray-500 mb-4">
-                  Manage how you receive notifications.
-                </p>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b pb-3">
-                    <Label htmlFor="orderUpdates">Order Updates</Label>
-                    <Switch
-                      id="orderUpdates"
-                      className="data-[state=checked]:bg-secondary"
-                      checked={notificationPrefs.orderUpdates}
-                      onCheckedChange={(checked) => 
-                        setNotificationPrefs(prev => ({ ...prev, orderUpdates: checked }))
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between border-b pb-3">
-                    <Label htmlFor="promotionsAndDeals">Promotions and deals</Label>
-                    <Switch
-                      id="promotionsAndDeals"
-                      className="data-[state=checked]:bg-secondary"
-                      checked={notificationPrefs.promotionsAndDeals}
-                      onCheckedChange={(checked) => 
-                        setNotificationPrefs(prev => ({ ...prev, promotionsAndDeals: checked }))
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between border-b pb-3">
-                    <Label htmlFor="newsletter">Newsletter</Label>
-                    <Switch
-                      id="newsletter"
-                      className="data-[state=checked]:bg-secondary"
-                      checked={notificationPrefs.newsletter}
-                      onCheckedChange={(checked) => 
-                        setNotificationPrefs(prev => ({ ...prev, newsletter: checked }))
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="wishlistUpdates">Wishlist updates</Label>
-                    <Switch
-                      id="wishlistUpdates"
-                      className="data-[state=checked]:bg-secondary"
-                      checked={notificationPrefs.wishlistUpdates}
-                      onCheckedChange={(checked) => 
-                        setNotificationPrefs(prev => ({ ...prev, wishlistUpdates: checked }))
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end mt-6">
-                  <Button 
-                    onClick={handleSaveNotificationPrefs}
-                    className="bg-secondary text-white"
-                    disabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Save Preferences"}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* ADDRESS TAB */}
-        <TabsContent value="address">
-          <Card>
-            <CardContent className="p-4 px-8">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h2 className="font-semibold mb-1 text-xl">Addresses</h2>
-                  <p className="text-sm text-gray-500">
-                    Manage your shipping and billing addresses.
-                  </p>
-                </div>
-                <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      className="bg-secondary text-white"
-                      onClick={() => {
-                        setEditingAddressIndex(null);
-                        setCurrentAddress(emptyAddress);
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Address
-                    </Button>
-                  </DialogTrigger>
-                  <AddressDialog
-                    open={isAddressModalOpen}
-                    onOpenChange={setIsAddressModalOpen}
-                    onSave={handleAddOrUpdateAddress}
-                    initialAddress={currentAddress}
-                  />
-                </Dialog>
-              </div>
-
-              <div className="space-y-4">
-                {customer.addresses && customer.addresses.length > 0 ? (
-                  customer.addresses.map((address, index) => (
-                    <div key={index} className="border p-4 rounded-sm">
-                      <div className="flex items-center gap-2 mb-1">
-                        <MapPin className="h-4 w-4 text-gray-400" />
-                        <span className="font-medium">{address.type || "Address"}</span>
-                        {address.isDefault && (
-                          <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-sm">
-                            Default
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {[
-                          address.street,
-                          address.city,
-                          address.state,
-                          address.zipCode,
-                          address.country
-                        ].filter(Boolean).join(", ")}
-                      </p>
-                      <div className="flex gap-2 text-sm">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleEditAddress(index)}
-                        >
-                          <Edit className="w-3 h-3 mr-1" /> Edit
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDeleteAddress(index)}
-                          className="text-red-500"
-                        >
-                          <Trash2 className="w-3 h-3 mr-1" /> Delete
-                        </Button>
-                        <Button 
-                          variant={address.isDefault ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleSetDefaultAddress(index)}
-                          disabled={address.isDefault}
-                          className={address.isDefault ? "bg-yellow-100 text-yellow-800" : ""}
-                        >
-                          <Star className="w-3 h-3 mr-1" /> 
-                          {address.isDefault ? "Default" : "Set as Default"}
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>No addresses found.</p>
-                    <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
-                      <DialogTrigger asChild>
-                        <Button 
-                          className="mt-2 bg-secondary text-white"
-                          onClick={() => {
-                            setEditingAddressIndex(null);
-                            setCurrentAddress(emptyAddress);
-                          }}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Address
-                        </Button>
-                      </DialogTrigger>
-                      <AddressDialog
-                        open={isAddressModalOpen}
-                        onOpenChange={setIsAddressModalOpen}
-                        onSave={handleAddOrUpdateAddress}
-                        initialAddress={currentAddress}
-                      />
-                    </Dialog>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* TRANSACTIONS TAB */}
-        <TabsContent value="transactions">
-          <Card>
-            <CardContent className="p-4 px-8">
-              <h2 className="font-semibold mb-1 text-xl">
-                Payment Transactions
-              </h2>
-              <p className="text-sm text-gray-500 mb-4">
-                Track your payments and download receipts. All transactions are
-                securely processed via XYZ gateway.
+              <p className="text-sm text-gray-600 mb-2">
+              {[
+                address.street,
+                address.city,
+                address.state,
+                address.zipCode,
+                address.country
+              ].filter(Boolean).join(", ")}
               </p>
-
-              <div className="space-y-3">
-                {customer.transactions && customer.transactions.length > 0 ? (
-                  customer.transactions.map((transaction) => (
-                    <div
-                      key={transaction._id}
-                      className="border p-4 rounded-sm flex flex-col md:flex-row justify-between"
-                    >
-                      <div>
-                        <div className="font-medium">
-                          {transaction.productName || transaction.description || "Transaction"}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Transaction ID: {transaction.transactionId}
-                        </div>
-                        <div className="text-sm text-gray-500 mb-1">
-                          {new Date(transaction.date).toLocaleDateString()}
-                        </div>
-                        <div className="font-semibold text-base">
-                          ${transaction.amount.toFixed(2)}
-                        </div>
-                      </div>
-                      <div className="flex flex-col md:items-end gap-2 mt-2 md:mt-0">
-                        <span
-                          className={`px-2 py-0.5 text-sm rounded-sm w-fit ${
-                            transaction.status === "Paid"
-                              ? "bg-green-100 text-green-700"
-                              : transaction.status === "Pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {transaction.status}
-                        </span>
-                        <Button variant="outline" size="sm">
-                          <Download className="h-3 w-3 mr-1" /> Download Receipt
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>No transactions found.</p>
-                  </div>
-                )}
+              <div className="flex flex-col sm:flex-row gap-2 text-sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleEditAddress(index)}
+              >
+                <Edit className="w-3 h-3 mr-1" /> Edit
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleDeleteAddress(index)}
+                className="text-red-500"
+              >
+                <Trash2 className="w-3 h-3 mr-1" /> Delete
+              </Button>
+              <Button 
+                variant={address.isDefault ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleSetDefaultAddress(index)}
+                disabled={address.isDefault}
+                className={address.isDefault ? "bg-yellow-100 text-yellow-800" : ""}
+              >
+                <Star className="w-3 h-3 mr-1" /> 
+                {address.isDefault ? "Default" : "Set as Default"}
+              </Button>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+            <p>No addresses found.</p>
+            <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
+              <DialogTrigger asChild>
+              <Button 
+                className="mt-2 bg-secondary text-white"
+                onClick={() => {
+                setEditingAddressIndex(null);
+                setCurrentAddress(emptyAddress);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Address
+              </Button>
+              </DialogTrigger>
+              <AddressDialog
+              open={isAddressModalOpen}
+              onOpenChange={setIsAddressModalOpen}
+              onSave={handleAddOrUpdateAddress}
+              initialAddress={currentAddress}
+              />
+            </Dialog>
+            </div>
+          )}
+          </div>
+        </CardContent>
+        </Card>
+      </TabsContent>
+
+      {/* TRANSACTIONS TAB */}
+      <TabsContent value="transactions">
+        <Card>
+        <CardContent className="p-4 md:px-8">
+          <h2 className="font-semibold mb-1 text-xl">
+          Payment Transactions
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+          Track your payments and download receipts. All transactions are
+          securely processed via XYZ gateway.
+          </p>
+
+          <div className="space-y-3">
+          {customer.transactions && customer.transactions.length > 0 ? (
+            customer.transactions.map((transaction) => (
+            <div
+              key={transaction._id}
+              className="border p-4 rounded-sm flex flex-col md:flex-row justify-between"
+            >
+              <div>
+              <div className="font-medium">
+                {transaction.productName || transaction.description || "Transaction"}
+              </div>
+              <div className="text-sm text-gray-500">
+                Transaction ID: {transaction.transactionId}
+              </div>
+              <div className="text-sm text-gray-500 mb-1">
+                {new Date(transaction.date).toLocaleDateString()}
+              </div>
+              <div className="font-semibold text-base">
+                ${transaction.amount.toFixed(2)}
+              </div>
+              </div>
+              <div className="flex flex-col md:items-end gap-2 mt-2 md:mt-0">
+              <span
+                className={`px-2 py-0.5 text-sm rounded-sm w-fit ${
+                transaction.status === "Paid"
+                  ? "bg-green-100 text-green-700"
+                  : transaction.status === "Pending"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-red-100 text-red-700"
+                }`}
+              >
+                {transaction.status}
+              </span>
+              <Button variant="outline" size="sm">
+                <Download className="h-3 w-3 mr-1" /> Download Receipt
+              </Button>
+              </div>
+            </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+            <p>No transactions found.</p>
+            </div>
+          )}
+          </div>
+        </CardContent>
+        </Card>
+      </TabsContent>
       </Tabs>
     </div>
   );
