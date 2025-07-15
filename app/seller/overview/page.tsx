@@ -85,7 +85,7 @@ const OverviewPage: React.FC = () => {
   const monthGrowth = sellerData?.salesMetrics.monthGrowth ?? 0;
 
   return (
-    <div className="py-6 min-h-screen">
+    <div className="py-6 min-h-screen p-4">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold">
@@ -101,35 +101,35 @@ const OverviewPage: React.FC = () => {
       </div>
 
       {/* Sales Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
         <div className="bg-white rounded-lg p-4 shadow">
           <div className="text-gray-500 text-sm">Sales Today</div>
           <div className="text-2xl font-bold">
-            ${todayRevenue.toLocaleString()}
+        ${todayRevenue.toLocaleString()}
           </div>
           <div className="text-green-600 text-xs mt-1">
-            {todayGrowth >= 0 ? "+" : ""}
-            {todayGrowth}% from last period
+        {todayGrowth >= 0 ? "+" : ""}
+        {todayGrowth}% from last period
           </div>
         </div>
         <div className="bg-white rounded-lg p-4 shadow">
           <div className="text-gray-500 text-sm">Sales This Week</div>
           <div className="text-2xl font-bold">
-            ${weekRevenue.toLocaleString()}
+        ${weekRevenue.toLocaleString()}
           </div>
-          <div className="text-green-600 text-xs mt-1">
-            {weekGrowth >= 0 ? "+" : ""}
-            {weekGrowth}% from last period
+          <div className="text-green-600 text-xs mt-1 w-full">
+        {weekGrowth >= 0 ? "+" : ""}
+        {weekGrowth}% from last period
           </div>
         </div>
-        <div className="bg-white rounded-lg p-4 shadow">
+        <div className="bg-white rounded-lg p-4 shadow col-span-2">
           <div className="text-gray-500 text-sm">Sales This Month</div>
           <div className="text-2xl font-bold">
-            ${monthRevenue.toLocaleString()}
+        ${monthRevenue.toLocaleString()}
           </div>
           <div className="text-green-600 text-xs mt-1">
-            {monthGrowth >= 0 ? "+" : ""}
-            {monthGrowth}% from last period
+        {monthGrowth >= 0 ? "+" : ""}
+        {monthGrowth}% from last period
           </div>
         </div>
       </div>
@@ -194,18 +194,20 @@ const OverviewPage: React.FC = () => {
       </div>
 
       {/* Low Stock Alert */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6 flex items-center justify-between">
-        <div className="flex items-center text-yellow-700">
-          <FiAlertCircle className="mr-2" />
-          You have{" "}
-          <span className="font-semibold mx-1">
-            {lowStockProducts} products
-          </span>{" "}
-          running low. Restock now.
+      <div className="bg-[#FFF7ED] border border-yellow-200 rounded-lg p-4 mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center text-yellow-700 text-sm md:text-base">
+          <FiAlertCircle className="mr-2 shrink-0" />
+          <span>
+        You have{" "}
+        <span className="font-semibold mx-1">
+          {lowStockProducts} products
+        </span>
+        running low. Restock now.
+          </span>
         </div>
         <Link
           href={"/seller/products"}
-          className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded hover:bg-yellow-200 transition"
+          className="bg-white border border-yellow-300 text-yellow-800 px-4 py-2 rounded hover:bg-yellow-200 transition w-fit text-center ml-auto"
         >
           View Products
         </Link>

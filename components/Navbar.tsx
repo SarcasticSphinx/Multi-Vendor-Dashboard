@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Globe, Bell, PanelLeft } from "lucide-react";
+import { Globe, Bell, PanelLeft, LogOut } from "lucide-react";
 import { FaChevronDown } from "react-icons/fa";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
@@ -16,9 +16,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="w-full border-b border-gray-200 bg-white fixed top-0 left-0 z-50 shadow-sm">
       <div className="flex items-center justify-between px-4 sm:px-8 py-4">
-        {/* Left section - Mobile menu trigger + Logo */}
-        <div className="flex items-center gap-3">
-          {/* Mobile sidebar trigger - only show on mobile when logged in */}
+        <div className="flex items-center sm:gap-3 gap-25">
           {session?.user && (
             <button
               onClick={() => setIsMobileOpen(true)}
@@ -46,11 +44,6 @@ const Navbar: React.FC = () => {
             <FaChevronDown size={12} />
           </button>
 
-          {/* Help - Show icon only on mobile */}
-          {/* <button className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition">
-            <HelpCircle size={20} />
-            <span className="hidden sm:inline text-sm font-medium">Help</span>
-          </button> */}
 
           {session?.user ? (
             <>
@@ -62,7 +55,6 @@ const Navbar: React.FC = () => {
                 </span>
               </button>
 
-              {/* User - Simplified on mobile */}
               <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-100 transition">
                 {session?.user?.image ? (
                   <img
@@ -84,13 +76,12 @@ const Navbar: React.FC = () => {
                 />
               </button>
 
-              {/* Sign Out - Text hidden on mobile */}
               <button
                 onClick={() => signOut()}
-                className="px-2 sm:px-4 py-2 bg-secondary text-white rounded-md hover:bg-secondary/90 transition text-sm"
+                className="px-2 sm:px-4 py-2 bg-red-600 text-white rounded-md hover:bg-secondary/90 transition text-sm"
               >
-                <span className="hidden sm:inline">Sign Out</span>
-                <span className="sm:hidden">Out</span>
+                <span className="hidden sm:flex gap-2 "><LogOut size={18}/>Sign Out</span>
+                <span className="sm:hidden"><LogOut size={18}/></span>
               </button>
             </>
           ) : (

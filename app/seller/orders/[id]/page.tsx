@@ -4,10 +4,24 @@ import React, { use, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoveLeft, Phone, Printer, Truck, X, Mail, MapPin, AlertTriangle } from "lucide-react";
+import {
+  MoveLeft,
+  Phone,
+  Printer,
+  Truck,
+  X,
+  Mail,
+  MapPin,
+  AlertTriangle,
+} from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DialogHeader } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
@@ -66,16 +80,16 @@ interface OrderDetails {
 }
 
 const OrderDetailsPage = ({ params }: PageProps) => {
-  const {data: session} = useSession();
+  const { data: session } = useSession();
   if (!session) {
     redirect("/login");
   }
   if (session.user.role !== "seller") {
-      redirect("/unauthorized");
-    }
+    redirect("/unauthorized");
+  }
   const par = use(params);
   const { id } = par;
-  const router = useRouter()
+  const router = useRouter();
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -95,7 +109,7 @@ const OrderDetailsPage = ({ params }: PageProps) => {
   }, [id]);
 
   if (loading) {
-    return <Loading/>;
+    return <Loading />;
   }
 
   if (!order) {
@@ -178,17 +192,20 @@ const OrderDetailsPage = ({ params }: PageProps) => {
   return (
     <div className="mx-auto p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <MoveLeft onClick={() => router.back()} className="w-5 h-5" />
           <span className="text-xl font-semibold">Order Details</span>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
+        <div className="flex gap-2 mt-4 sm:mt-0">
+          <Button variant="outline" className="flex items-center gap-2 flex-1">
             <Printer className="w-4 h-4" />
             Print Invoice
           </Button>
-          <Button variant="secondary" className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            className="flex items-center gap-2 flex-1"
+          >
             <Phone />
             Contact Buyer
           </Button>
@@ -198,47 +215,98 @@ const OrderDetailsPage = ({ params }: PageProps) => {
       <div className="flex flex-col bg-white p-4 rounded-sm border shadow-sm">
         {" "}
         {/* Product Summary */}
-        <Card className="mb-6">
+        <Card className="mb-6 py-0 gap-0">
           {order.orderItems.map((item, index) => (
-            <CardContent key={index} className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
-                <img
-                  src={item.product.productImages[0] || "/placeholder.png"}
-                  alt={item.product.productTitle}
-                  className="w-14 h-14 object-cover rounded"
-                />
+            <React.Fragment key={index}>
+              {/* Mobile View */}
+              <CardContent className="flex flex-col sm:hidden items-start gap-1 mt-2 pb-4 border-gray-300 border-b">
+          <div className="flex gap-2 w-full">
+            <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+              <img
+                src={item.product.productImages[0] || "/placeholder.png"}
+                alt={item.product.productTitle}
+                className="w-14 h-14 object-cover rounded"
+              />
+            </div>
+            <div className="flex flex-row items-center gap-2">
+              <h3 className="text-base font-semibold">
+                {item.product.productTitle}
+              </h3>
+              <Badge className="bg-orange-100 text-orange-700 border-none text-xs w-fit h-fit">
+                {order.orderStatus}
+              </Badge>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 gap-2 mt-2 text-xs">
+            <div>
+              <span className="text-gray-500">Order ID</span>
+              <div className="font-medium">#{order.orderId}</div>
+            </div>
+            <div>
+              <span className="text-gray-500">Date</span>
+              <div className="font-medium">
+                {formatDate(order.createdAt)}
               </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-base font-semibold">
-                    {item.product.productTitle}
-                  </h3>
-                  <Badge className="bg-orange-100 text-orange-700 border-none text-xs px-2 py-1">
-                    {order.orderStatus}
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-4 gap-4 mt-2 text-sm">
-                  <div>
-                    <span className="text-gray-500">Order ID</span>
-                    <div className="font-medium">#{order.orderId}</div>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Date</span>
-                    <div className="font-medium">
-                      {formatDate(order.createdAt)}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Quantity</span>
-                    <div className="font-medium">{item.quantity}</div>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Condition</span>
-                    <div className="font-medium">{item.product.condition}</div>
-                  </div>
+            </div>
+            <div>
+              <span className="text-gray-500">Quantity</span>
+              <div className="font-medium">{item.quantity}</div>
+            </div>
+            <div>
+              <span className="text-gray-500">Condition</span>
+              <div className="font-medium">{item.product.condition}</div>
+            </div>
+          </div>
+              </CardContent>
+              {/* Desktop View */}
+              <CardContent className="hidden sm:flex items-center gap-4 py-4 border-b border-gray-200">
+          <div className="w-20 h-20 bg-gray-200 rounded flex items-center justify-center">
+            <img
+              src={item.product.productImages[0] || "/placeholder.png"}
+              alt={item.product.productTitle}
+              className="w-16 h-16 object-cover rounded"
+            />
+          </div>
+          <div className="flex-1 flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-base">
+                {item.product.productTitle}
+              </span>
+              <Badge className="bg-orange-100 text-orange-700 border-none text-xs px-2 py-1 ml-auto">
+                {order.orderStatus}
+              </Badge>
+            </div>
+            <div className="flex gap-8 mt-2">
+              <div>
+                <span className="text-gray-500 block text-xs">
+            Order ID
+                </span>
+                <div className="font-medium text-sm">#{order.orderId}</div>
+              </div>
+              <div>
+                <span className="text-gray-500 block text-xs">Date</span>
+                <div className="font-medium text-sm">
+            {formatDate(order.createdAt)}
                 </div>
               </div>
-            </CardContent>
+              <div>
+                <span className="text-gray-500 block text-xs">
+            Quantity
+                </span>
+                <div className="font-medium text-sm">{item.quantity}</div>
+              </div>
+              <div>
+                <span className="text-gray-500 block text-xs">
+            Condition
+                </span>
+                <div className="font-medium text-sm">
+            {item.product.condition}
+                </div>
+              </div>
+            </div>
+          </div>
+              </CardContent>
+            </React.Fragment>
           ))}
         </Card>
         {/* Main Grid */}
@@ -341,57 +409,72 @@ const OrderDetailsPage = ({ params }: PageProps) => {
         </div>
         {/* Action Buttons */}
         <div className="flex gap-2 mt-8">
-            <Button
+          <Button
             variant="outline"
-            className="border-red-200 text-red-600"
+            className="border-red-200 text-red-600 w-1/2 sm:w-fit"
             onClick={() => setShowCancelModal(true)}
-            >
+          >
             <X />
             Cancel Order
-            </Button>
-            {/* Cancel Order Modal */}
-            <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+          </Button>
+          {/* Cancel Order Modal */}
+          <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
             <DialogContent className="w-sm">
               <div className="flex flex-col items-center gap-2">
-              <div className="bg-red-100 rounded-full p-3 mb-2">
-                <AlertTriangle className="text-red-500 w-8 h-8" />
-              </div>
-              <DialogHeader>
-                <DialogTitle className="text-center">Cancel Order?</DialogTitle>
-                <DialogDescription className="text-center">
-                Are you sure you want to cancel this order? The customer will be notified and the order will be marked as cancelled.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="w-full mt-4">
-                <label className="font-medium mb-1 block">
-                Reason for cancellation <span className="text-red-500">*</span>
-                </label>
-                <Textarea
-                placeholder="Enter reason for cancellation"
-                />
-              </div>
-              <div className="w-full bg-gray-50 rounded p-3 mt-4 text-sm">
-                <div className="font-semibold mb-2">Order Summary</div>
-                <div>Order ID: <span className="font-medium">#{order.orderId}</span></div>
-                <div>Product: <span className="font-medium">{order.orderItems[0]?.product.productTitle}</span></div>
-                <div>Customer: <span className="font-medium">{order.customer.firstName} {order.customer.lastName}</span></div>
-              </div>
-              <div className="flex gap-2 mt-6 w-full">
-                <Button variant="outline" className="flex-1" onClick={() => setShowCancelModal(false)}>
-                Keep Order
-                </Button>
-                <Button
-                variant="destructive"
-                className="flex-1"
-
-                >
-                Cancel Order
-                </Button>
-              </div>
+                <div className="bg-red-100 rounded-full p-3 mb-2">
+                  <AlertTriangle className="text-red-500 w-8 h-8" />
+                </div>
+                <DialogHeader>
+                  <DialogTitle className="text-center">
+                    Cancel Order?
+                  </DialogTitle>
+                  <DialogDescription className="text-center">
+                    Are you sure you want to cancel this order? The customer
+                    will be notified and the order will be marked as cancelled.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="w-full mt-4">
+                  <label className="font-medium mb-1 block">
+                    Reason for cancellation{" "}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <Textarea placeholder="Enter reason for cancellation" />
+                </div>
+                <div className="w-full bg-gray-50 rounded p-3 mt-4 text-sm">
+                  <div className="font-semibold mb-2">Order Summary</div>
+                  <div>
+                    Order ID:{" "}
+                    <span className="font-medium">#{order.orderId}</span>
+                  </div>
+                  <div>
+                    Product:{" "}
+                    <span className="font-medium">
+                      {order.orderItems[0]?.product.productTitle}
+                    </span>
+                  </div>
+                  <div>
+                    Customer:{" "}
+                    <span className="font-medium">
+                      {order.customer.firstName} {order.customer.lastName}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-6 w-full">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowCancelModal(false)}
+                  >
+                    Keep Order
+                  </Button>
+                  <Button variant="destructive" className="flex-1 ">
+                    Cancel Order
+                  </Button>
+                </div>
               </div>
             </DialogContent>
-            </Dialog>
-          <Button variant={"secondary"}>
+          </Dialog>
+          <Button variant={"secondary"} className="flex-1 sm:flex-none">
             <Truck />
             Ship Order
           </Button>

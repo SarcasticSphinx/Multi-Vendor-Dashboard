@@ -117,29 +117,28 @@ const SellerOrdersPage = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className=" mx-auto p-4">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold mb-2">Orders</h1>
+      <div className="mb-4">
+        <h1 className="text-xl font-semibold mb-2">Orders</h1>
       </div>
-      <div className="relative mb-6">
+      <div className="relative mb-4 bg-white">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <input
           type="text"
           placeholder="Search by order id or customer name"
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
       {/* Status Tabs */}
-
       <Tabs
         value={statusFilter}
         onValueChange={setStatusFilter}
-        className="mb-6 w-full"
+        className="mb-4 w-full"
       >
-        <TabsList className="grid grid-cols-4 w-full mb-4 h-full p-1">
+        <TabsList className="grid grid-cols-4 w-full mb-2 h-full p-1">
           <TabsTrigger className="py-2" value="All">
             All
           </TabsTrigger>
@@ -154,9 +153,135 @@ const SellerOrdersPage = () => {
           </TabsTrigger>
         </TabsList>
       </Tabs>
-
-      {/* Orders Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      {/* Orders Card List (mobile) */}
+      <div className="space-y-4 md:hidden">
+        {filteredOrders.length > 0 ? (
+          filteredOrders.map((order) => (
+            <div
+              key={order.orderId}
+              className="bg-white rounded-lg border border-gray-200 p-4"
+            >
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-semibold">Ord-{order.orderId}</span>
+                <span className="text-xs text-gray-500">
+                  {formatDate(order.orderDate)}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-sm mb-2">
+                <div>
+                  <div className="text-gray-500">Buyer</div>
+                  <div className="font-medium">
+                    {order.customer.firstName} {order.customer.lastName}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-gray-500">Amount</div>
+                  <div className="font-medium">${order.pricing.total}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500">Status</div>
+                  <span
+                    className={`inline-block px-2 py-1 text-xs font-medium rounded ${getStatusClass(
+                      order.orderStatus
+                    )}`}
+                  >
+                    {order.orderStatus.charAt(0).toUpperCase() +
+                      order.orderStatus.slice(1)}
+                  </span>
+                </div>
+              </div>
+              <hr className="block sm:hidden" />
+              <div className="flex gap-2 mt-2">
+                <Link href={`/seller/orders/${order._id}`} className="flex-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full flex items-center justify-center gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View Details
+                  </Button>
+                </Link>
+                {order.orderStatus === "pending" && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-1/2 flex items-center justify-center gap-2"
+                    onClick={() => setSelectedOrder(order)}
+                  >
+                    <Truck className="w-4 h-4" />
+                    Ship Order
+                  </Button>
+                )}
+              </div>
+              {/* Dialog for Ship Order */}
+              {selectedOrder?.orderId === order.orderId && (
+                <Dialog
+                  open={true}
+                  onOpenChange={() => setSelectedOrder(null)}
+                >
+                  <DialogContent className="max-w-xs">
+                    <DialogHeader>
+                      <DialogTitle>
+                        Order #{order.orderId}
+                      </DialogTitle>
+                      <DialogDescription>
+                        Placed on {formatDate(order.orderDate)}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2 mt-4">
+                      <div className="flex justify-between border-b pb-2">
+                        <span>Status:</span>
+                        <span className="text-yellow-600 font-medium">
+                          {order.orderStatus}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Products:</span>
+                        <div className="flex flex-col items-end">
+                          {order.orderItems.map((item) => (
+                            <span key={item.product.productTitle}>
+                              {item.product.productTitle} (x{item.quantity})
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Amount:</span>
+                        <span>${order.pricing.total}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Customer:</span>
+                        <span>
+                          {order.customer.firstName} {order.customer.lastName}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex mt-6 w-full">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedOrder(null)}
+                        className="flex-1 mr-2"
+                      >
+                        <X />
+                        Cancel
+                      </Button>
+                      <Button variant="secondary" className="flex-1 ml-2">
+                        <Truck />
+                        Ship Order
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500 py-8">No orders found</div>
+        )}
+      </div>
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-lg border border-gray-200 overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -202,7 +327,8 @@ const SellerOrdersPage = () => {
                           {selectedOrder?.orderId === order.orderId && (
                             <Dialog
                               open={true}
-                              onOpenChange={() => setSelectedOrder(null)}                            >
+                              onOpenChange={() => setSelectedOrder(null)}
+                            >
                               <DialogContent className="w-sm">
                                 <DialogHeader>
                                   <DialogTitle>
@@ -223,10 +349,10 @@ const SellerOrdersPage = () => {
                                     <span>Products:</span>
                                     <div className="flex flex-col justify-end items-end">
                                       {order.orderItems.map((item) => (
-                                      <span key={item.product.productTitle}>
-                                        {item.product.productTitle} (x{item.quantity})
-                                      </span>
-                                    ))}
+                                        <span key={item.product.productTitle}>
+                                          {item.product.productTitle} (x{item.quantity})
+                                        </span>
+                                      ))}
                                     </div>
                                   </div>
                                   <div className="flex justify-between">

@@ -14,7 +14,7 @@ const PaymentPage = () => {
       redirect("/unauthorized");
     }
   return (
-    <div className="mx-auto p-6">
+    <div className="mx-auto p-4">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold mb-2">Payments</h1>
         <p className="text-gray-500 text-sm">
