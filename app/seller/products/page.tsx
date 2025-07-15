@@ -156,231 +156,321 @@ const ProductsPage = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
-        <Link href={"/seller/products/add-product"} className="no-underline">
-          <button className="bg-secondary text-white px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-secondary/90 transition-colors">
-            <Plus size={20} />
-            Add Product
-          </button>
-        </Link>
+      <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
+      <Link href={"/seller/products/add-product"} className="no-underline">
+        <button className="bg-secondary text-white px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-secondary/90 transition-colors">
+        <Plus size={20} />
+        Add Product
+        </button>
+      </Link>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
-        {/* Search */}
-        <div className="relative flex-1 ">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search by name or SKU"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary"
-          />
-        </div>
-
-        {/* Category Filter */}
-        <div className="relative">
-          <button
-            onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-sm bg-white hover:bg-gray-50 min-w-[150px] justify-between"
-          >
-            <span className="text-gray-700">Category</span>
-            <ChevronDown
-              size={16}
-              className={`transform transition-transform ${
-                isCategoryOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          {isCategoryOpen && (
-            <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 rounded-sm shadow-lg z-10 max-h-60 overflow-y-auto">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => {
-                    setSelectedCategory(category);
-                    setIsCategoryOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 hover:bg-gray-50 text-sm ${
-                    selectedCategory === category
-                      ? "bg-secondary/10 text-secondary"
-                      : "text-gray-700"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Status Filter */}
-        <div className="relative">
-          <button
-            onClick={() => setIsStatusOpen(!isStatusOpen)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-sm bg-white hover:bg-gray-50 min-w-[130px] justify-between"
-          >
-            <span className="text-gray-700">Stock Status</span>
-            <ChevronDown
-              size={16}
-              className={`transform transition-transform ${
-                isStatusOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          {isStatusOpen && (
-            <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 rounded-sm shadow-lg z-10">
-              {statuses.map((status) => (
-                <button
-                  key={status}
-                  onClick={() => {
-                    setSelectedStatus(status);
-                    setIsStatusOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 hover:bg-gray-50 text-sm ${
-                    selectedStatus === status
-                      ? "bg-secondary/10 text-secondary"
-                      : "text-gray-700"
-                  }`}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+      <div className="flex gap-4 mb-6 flex-col sm:flex-row">
+      {/* Search */}
+      <div className="relative flex-1 ">
+        <Search
+        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+        size={20}
+        />
+        <input
+        type="text"
+        placeholder="Search by name or SKU"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full pl-10 pr-4 py-2 border bg-white border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary"
+        />
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-white border-b border-gray-200">
-              <tr>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">
-                  Image
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">
-                  Name
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">
-                  SKU
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">
-                  Price
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">
-                  Stock
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">
-                  Status
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">
-                  Negotiation
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredProducts.map((product) => (
-                <tr key={product._id} className="hover:bg-gray-50">
-                  <td className="py-4 px-4">
-                    <div className="relative w-full max-w-[50px] aspect-square bg-gray-200 rounded-lg">
-                      {product.productImages?.length > 0 ? (
-                        <Image
-                          src={product.productImages[0]}
-                          alt={product.productTitle}
-                          fill
-                          className="object-cover rounded-lg"
-                          sizes="(max-width: 768px) 60px"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-300 rounded-lg"></div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-4 px-4 text-gray-900">
-                    {product.productTitle}
-                  </td>
-                  <td className="py-4 px-4 text-gray-600">{product.sku}</td>
-                  <td className="py-4 px-4 text-gray-900">${product.price}</td>
-                  <td className="py-4 px-4 text-gray-600">
-                    {product.quantity}
-                  </td>
-                  <td className="py-4 px-4">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                        product.status
-                      )}`}
-                    >
-                      {getStatusText(product.status)}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={product.enableNegotiation}
-                        readOnly
-                        className="w-4 h-4 text-secondary border-gray-300 rounded focus:ring-secondary"
-                      />
-                    </div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/seller/products/edit-product/${product._id}`}
-                      >
-                        <button
-                          onClick={() => handleEdit(product._id)}
-                          className="p-2 text-gray-600 hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </Link>
-                      <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                      {isModalOpen && (
-                        <Modal
-                          icon={<TriangleAlert size={24} className="text-red-600" />}
-                          color="bg-red-50"
-                          heading="Delete Product"
-                          description="Are you sure you want to delete this product?"
-                          detail="This action cannot be undone."
-                          buttonName="Delete"
-                          onCancel={() => setIsModalOpen(false)}
-                          onConfirm={() => {
-                            handleDelete(product._id);
-                            setIsModalOpen(false);
-                          }}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Category Filter */}
+      <div className="relative w-full sm:w-auto">
+        <button
+        onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-sm bg-white hover:bg-gray-50 min-w-[150px] justify-between w-full"
+        >
+        <span className="text-gray-700">Category</span>
+        <ChevronDown
+          size={16}
+          className={`transform transition-transform ${
+          isCategoryOpen ? "rotate-180" : ""
+          }`}
+        />
+        </button>
+        {isCategoryOpen && (
+        <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 rounded-sm shadow-lg z-10 max-h-60 overflow-y-auto">
+          {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => {
+            setSelectedCategory(category);
+            setIsCategoryOpen(false);
+            }}
+            className={`w-full text-left px-4 py-2 hover:bg-gray-50 text-sm ${
+            selectedCategory === category
+              ? "bg-secondary/10 text-secondary"
+              : "text-gray-700"
+            }`}
+          >
+            {category}
+          </button>
+          ))}
         </div>
+        )}
       </div>
 
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">
-            No products found matching your criteria.
-          </p>
+      {/* Status Filter */}
+      <div className="relative w-full sm:w-auto">
+        <button
+        onClick={() => setIsStatusOpen(!isStatusOpen)}
+        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-sm bg-white hover:bg-gray-50 min-w-[130px] justify-between w-full"
+        >
+        <span className="text-gray-700">Stock Status</span>
+        <ChevronDown
+          size={16}
+          className={`transform transition-transform ${
+          isStatusOpen ? "rotate-180" : ""
+          }`}
+        />
+        </button>
+        {isStatusOpen && (
+        <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 rounded-sm shadow-lg z-10">
+          {statuses.map((status) => (
+          <button
+            key={status}
+            onClick={() => {
+            setSelectedStatus(status);
+            setIsStatusOpen(false);
+            }}
+            className={`w-full text-left px-4 py-2 hover:bg-gray-50 text-sm ${
+            selectedStatus === status
+              ? "bg-secondary/10 text-secondary"
+              : "text-gray-700"
+            }`}
+          >
+            {status}
+          </button>
+          ))}
         </div>
-      )}
+        )}
+      </div>
+      </div>
+
+      {/* Desktop/Table View */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden hidden md:block">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+        <thead className="bg-white border-b border-gray-200">
+          <tr>
+          <th className="text-left py-3 px-4 font-medium text-gray-700">
+            Image
+          </th>
+          <th className="text-left py-3 px-4 font-medium text-gray-700">
+            Name
+          </th>
+          <th className="text-left py-3 px-4 font-medium text-gray-700">
+            SKU
+          </th>
+          <th className="text-left py-3 px-4 font-medium text-gray-700">
+            Price
+          </th>
+          <th className="text-left py-3 px-4 font-medium text-gray-700">
+            Stock
+          </th>
+          <th className="text-left py-3 px-4 font-medium text-gray-700">
+            Status
+          </th>
+          <th className="text-left py-3 px-4 font-medium text-gray-700">
+            Negotiation
+          </th>
+          <th className="text-left py-3 px-4 font-medium text-gray-700">
+            Actions
+          </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {filteredProducts.map((product) => (
+          <tr key={product._id} className="hover:bg-gray-50">
+            <td className="py-4 px-4">
+            <div className="relative w-full max-w-[50px] aspect-square bg-gray-200 rounded-lg">
+              {product.productImages?.length > 0 ? (
+              <Image
+                src={product.productImages[0]}
+                alt={product.productTitle}
+                fill
+                className="object-cover rounded-lg"
+                sizes="(max-width: 768px) 60px"
+              />
+              ) : (
+              <div className="w-full h-full bg-gray-300 rounded-lg"></div>
+              )}
+            </div>
+            </td>
+            <td className="py-4 px-4 text-gray-900">
+            {product.productTitle}
+            </td>
+            <td className="py-4 px-4 text-gray-600">{product.sku}</td>
+            <td className="py-4 px-4 text-gray-900">${product.price}</td>
+            <td className="py-4 px-4 text-gray-600">
+            {product.quantity}
+            </td>
+            <td className="py-4 px-4">
+            <span
+              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+              product.status
+              )}`}
+            >
+              {getStatusText(product.status)}
+            </span>
+            </td>
+            <td className="py-4 px-4">
+            <div className="flex items-center">
+              <input
+              type="checkbox"
+              checked={product.enableNegotiation}
+              readOnly
+              className="w-4 h-4 text-secondary border-gray-300 rounded focus:ring-secondary"
+              />
+            </div>
+            </td>
+            <td className="py-4 px-4">
+            <div className="flex items-center gap-2">
+              <Link
+              href={`/seller/products/edit-product/${product._id}`}
+              >
+              <button
+                onClick={() => handleEdit(product._id)}
+                className="p-2 text-gray-600 hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
+              >
+                <Edit size={16} />
+              </button>
+              </Link>
+              <button
+              onClick={() => setIsModalOpen(true)}
+              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+              <Trash2 size={16} />
+              </button>
+              {isModalOpen && (
+              <Modal
+                icon={<TriangleAlert size={24} className="text-red-600" />}
+                color="bg-red-50"
+                heading="Delete Product"
+                description="Are you sure you want to delete this product?"
+                detail="This action cannot be undone."
+                buttonName="Delete"
+                onCancel={() => setIsModalOpen(false)}
+                onConfirm={() => {
+                handleDelete(product._id);
+                setIsModalOpen(false);
+                }}
+              />
+              )}
+            </div>
+            </td>
+          </tr>
+          ))}
+        </tbody>
+        </table>
+      </div>
+      </div>
+
+
+      {/* Mobile Card View */}
+      <div className="md:hidden sm:hidden">
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-12">
+        <p className="text-gray-500">
+          No products found matching your criteria.
+        </p>
+          </div>
+        )}
+        <div className="flex flex-col gap-4">
+          {filteredProducts.map((product) => (
+        <div
+          key={product._id}
+          className="bg-white rounded-lg shadow-sm p-4 flex flex-col gap-3"
+        >
+          <div className="flex gap-3 items-center">
+            <div className="w-12 h-12 relative bg-gray-200 rounded-lg shrink-0">
+          {product.productImages?.length > 0 ? (
+            <Image
+              src={product.productImages[0]}
+              alt={product.productTitle}
+              fill
+              className="object-cover rounded-lg"
+              sizes="48px"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-300 rounded-lg"></div>
+          )}
+            </div>
+            <div className="flex-1">
+          <div className="font-semibold text-gray-900 text-base">
+            {product.productTitle}
+          </div>
+          <div className="text-xs text-gray-500">{product.sku}</div>
+            </div>
+          </div>
+          <hr className="bg-gray-500" />
+          <div className="flex justify-between mt-2 mb-2">
+            <div>
+          <div className="text-xs text-gray-500">Price</div>
+          <div className="font-medium text-gray-900 text-sm">${product.price}</div>
+            </div>
+            <div>
+          <div className="text-xs text-gray-500">Stock</div>
+          <div className="font-medium text-gray-900 text-sm">{product.quantity}</div>
+            </div>
+            <div>
+          <div className="text-xs text-gray-500">Status</div>
+          <span
+            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+              product.status
+            )}`}
+          >
+            {getStatusText(product.status)}
+          </span>
+            </div>
+          </div>
+          <hr className="bg-gray-500" />
+
+          <div className="flex gap-2 mt-2">
+            <Link href={`/seller/products/edit-product/${product._id}`} className="flex-1">
+          <button
+            onClick={() => handleEdit(product._id)}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded hover:bg-secondary/10 hover:text-secondary transition-colors"
+          >
+            <Edit size={16} />
+            <span>Edit</span>
+          </button>
+            </Link>
+            <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-white border border-red-200 text-red-600 rounded hover:bg-red-50 transition-colors"
+            >
+          <Trash2 size={16} />
+          <span>Delete</span>
+            </button>
+            {isModalOpen && (
+          <Modal
+            icon={<TriangleAlert size={24} className="text-red-600" />}
+            color="bg-red-50"
+            heading="Delete Product"
+            description="Are you sure you want to delete this product?"
+            detail="This action cannot be undone."
+            buttonName="Delete"
+            onCancel={() => setIsModalOpen(false)}
+            onConfirm={() => {
+              handleDelete(product._id);
+              setIsModalOpen(false);
+            }}
+          />
+            )}
+          </div>
+        </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

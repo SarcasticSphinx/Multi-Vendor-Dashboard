@@ -11,8 +11,7 @@ const SearchBox = () => {
   if (!session) return null;
 
   return (
-    <form className="flex items-center p-4 lg:px-20 shadow-sm bg-white fixed top-18 left-0 z-50 w-full mx-auto border border-gray-200">
-      {/* Categories Dropdown - hidden on mobile */}
+    <form className="flex items-center p-4 lg:px-28 shadow-sm bg-white fixed top-18 left-0 z-50 w-full mx-auto border border-gray-200">
       <div className="hidden sm:flex items-center border border-gray-300 rounded-l-sm px-2 sm:px-4 py-2 w-fit bg-white">
         <span className="text-gray-500 text-sm">Categories</span>
         <ChevronDown className="w-4 h-4 ml-2 text-gray-400" />
@@ -28,8 +27,6 @@ const SearchBox = () => {
         />
       </div>
 
-      {/* Search Button */}
-      {/* Desktop: text, Tablet: icon only, Mobile: icon only and no category */}
       <button
         type="submit"
         className="sm:ml-4 sm:px-6 sm:py-2 p-2 ml-2 rounded bg-secondary text-white font-medium hover:bg-secondary/90 transition"
@@ -40,7 +37,6 @@ const SearchBox = () => {
         </span>
       </button>
 
-      {/* Wishlist & Cart - only for customer, hidden on mobile */}
       {session?.user.role === "customer" && (
         <div className="hidden sm:flex items-center gap-4 ml-6">
           <Link href="/customer/wishlist">

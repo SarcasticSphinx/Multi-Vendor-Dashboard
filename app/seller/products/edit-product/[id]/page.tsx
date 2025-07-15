@@ -216,7 +216,7 @@ const EditProductPage = ({ params }: PageProps) => {
   }
 
   return (
-    <div className="w-full mx-auto p-6">
+    <div className="w-full mx-auto p-4">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button
@@ -234,7 +234,7 @@ const EditProductPage = ({ params }: PageProps) => {
       </div>
 
       {/* General Information */}
-      <div className="mb-8 rounded-md bg-white p-6">
+      <div className="mb-8 rounded-md bg-white p-2">
         <h2 className="text-lg font-medium mb-4">General Information</h2>
 
         <div className="grid grid-cols-1 gap-4">
@@ -278,7 +278,7 @@ const EditProductPage = ({ params }: PageProps) => {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
-              <div className="grid grid-cols-4 gap-4 mb-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 {[...Array(4)].map((_, index) =>
                   product.productImages &&
                   product.productImages.length > index &&
@@ -661,7 +661,7 @@ const EditProductPage = ({ params }: PageProps) => {
                 </span>
               ))}
             </div>
-            <div className="flex gap-2">
+            <div className="flex sm:flex-row flex-col gap-2">
               <input
                 type="text"
                 value={tagInput}
@@ -711,10 +711,10 @@ const EditProductPage = ({ params }: PageProps) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-between pt-6 border-t p-6 bg-white">
+      <div className="flex justify-between gap-2 pt-6 border-t p-6 bg-white">
         <button
           onClick={handleDiscard}
-          className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded-sm hover:bg-red-600 hover:text-white  transition-colors"
+          className="flex flex-1 sm:flex-none items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded-sm hover:bg-red-600 hover:text-white  transition-colors"
         >
           <Trash2 className="size-5" />
           Discard
@@ -722,7 +722,7 @@ const EditProductPage = ({ params }: PageProps) => {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-2 bg-secondary text-white rounded-sm hover:bg-secondary/90 disabled:opacity-50 font-medium"
+          className="flex-1 sm:flex-none px-6 py-2 bg-secondary text-white rounded-sm hover:bg-secondary/90 disabled:opacity-50 font-medium"
         >
           {saving ? "Saving..." : "Save Product"}
         </button>

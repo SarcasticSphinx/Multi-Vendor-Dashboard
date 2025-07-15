@@ -40,7 +40,7 @@ export default async function RootLayout({
             <div
               className={`${
                 session
-                  ? "pl-0 md:pl-16 lg:pl-64 pt-40"
+                  ? "pl-0 md:pl-16 lg:pl-64 pt-40 lg:pr-20"
                   : "min-h-screen mt-20 flex items-center justify-center px-4 sm:px-30"
               }`}
             >

@@ -617,17 +617,17 @@ const AddProductPage: React.FC = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="p-6 border-t bg-gray-50 flex justify-between">
-            <button className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded-sm hover:bg-red-600 hover:text-white  transition-colors">
+          <div className="p-6 border-t bg-gray-50 flex justify-between gap-2">
+            <button className="flex text-sm items-center gap-2 sm:px-4 sm:py-2 p-2 border border-red-600 text-red-600 rounded-sm hover:bg-red-600 hover:text-white  transition-colors">
               <Trash2 className="size-5" />
               Discard
             </button>
-            <div className="flex items-center gap-4">
-              <button className="px-6 py-2 border border-gray-300 rounded-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <div className="flex items-center gap-2">
+              <button className="text-shadow-md sm:px-6 sm:py-2 p-2 text-sm border border-gray-300 rounded-sm text-gray-700 hover:bg-gray-50 transition-colors">
                 Save Draft
               </button>
               <button
-                className="px-6 py-2 bg-secondary text-white rounded-sm hover:bg-secondary/90 transition-colors"
+                className="text-sm sm:px-6 sm:py-2 p-2 bg-secondary text-white rounded-sm hover:bg-secondary/90 transition-colors"
                 onClick={handleSubmit}
               >
                 Send for Review
