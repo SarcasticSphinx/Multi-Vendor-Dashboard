@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify";
 import AuthProvider from "../lib/AuthProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import LayoutWrapper from "../components/LayoutWrapper";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -28,7 +29,7 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession(authOptions);
   console.log("Session:", session);
-  
+
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased bg-gray-50`}>
@@ -37,15 +38,7 @@ export default async function RootLayout({
             <Navbar />
             <SearchBox />
             <Sidebar />
-            <div
-              className={`${
-                session
-                  ? "pl-0 md:pl-16 lg:pl-64 pt-40 lg:pr-20"
-                  : "min-h-screen mt-20 flex items-center justify-center px-4 sm:px-30"
-              }`}
-            >
-              {children}
-            </div>
+            <LayoutWrapper>{children}</LayoutWrapper>
           </SidebarProvider>
           <ToastContainer
             position="top-right"

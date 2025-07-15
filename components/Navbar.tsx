@@ -16,7 +16,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="w-full border-b border-gray-200 bg-white fixed top-0 left-0 z-50 shadow-sm lg:px-12">
       <div className="flex items-center justify-between px-4 sm:px-8 py-4">
-        <div className="flex items-center sm:gap-3 gap-25">
+        <div className="flex items-center sm:gap-3 gap-20">
           {session?.user && (
             <button
               onClick={() => setIsMobileOpen(true)}
